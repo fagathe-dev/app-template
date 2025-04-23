@@ -1,0 +1,41 @@
+{
+  "devDependencies": {
+    "@babel/core": "^7.17.0",
+    "@babel/preset-env": "^7.16.0",
+    "@hotwired/stimulus": "^3.0.0",
+    "@symfony/stimulus-bridge": "^3.2.0",
+    "@symfony/webpack-encore": "^4.0.0",
+    "core-js": "^3.23.0",
+    "css-loader": "^6.8.1",
+    "file-loader": "^6.0.0",
+    "regenerator-runtime": "^0.13.9",
+    "rtlcss": "^4.1.0",
+    "rtlcss-loader": "^1.0.3",
+    "rtlcss-webpack-plugin": "^4.0.7",
+    "sass": "^1.69.5",
+    "sass-loader": "^13.3.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-notifier": "^1.15.0",
+    "@types/node": "^22.13.0",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
+    "@typescript-eslint/parser": "^7.17.0"
+  },
+  "dependencies": {
+    "bootstrap": "5.3.2",
+    "node-sass": "^9.0.0",
+    "postcss-rtl": "^2.0.0",
+    "rtl-css-loader": "^1.0.1",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress",
+    "tsc": "tsc --watch"
+  }
+}
