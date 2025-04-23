@@ -1,5 +1,13 @@
 twig:
     file_name_pattern: '*.twig'
+    globals:
+        APP_NAME: '%env(APP_NAME)%'
+        APP_VERSION: '%env(APP_VERSION)%'
+        APP_SEO_TITLE: '%env(APP_SEO_TITLE)%'
+        APP_LINKEDIN_URL: '%env(APP_LINKEDIN_URL)%'
+        APP_GITHUB_URL: '%env(APP_GITHUB_URL)%'
+        APP_PHONE_NUMBER: '%env(APP_PHONE_NUMBER)%'
+        APP_EMAIL_CONTACT: '%env(APP_EMAIL_CONTACT)%'
 
 when@test:
     twig:
