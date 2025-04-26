@@ -19,7 +19,10 @@
     "webpack-notifier": "^1.15.0",
     "@types/node": "^22.13.0",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0"
+    "@typescript-eslint/parser": "^7.17.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "@stylistic/eslint-plugin-js": "^2.4.0"
   },
   "dependencies": {
     "bootstrap": "5.3.2",
@@ -36,6 +39,8 @@
     "dev": "encore dev",
     "watch": "encore dev --watch",
     "build": "encore production --progress",
-    "tsc": "tsc --watch"
+    "tsc": "tsc --watch",
+    "tsc:build": "tsc && ./build.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

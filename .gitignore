@@ -10,6 +10,7 @@
 /node_modules/
 /var/
 /logs/
+/public/secret.php
 /vendor/
 ###< symfony/framework-bundle ###
 
