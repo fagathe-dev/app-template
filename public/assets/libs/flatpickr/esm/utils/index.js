@@ -1,17 +1,1 @@
-export var pad = function (number, length) {
-    if (length === void 0) { length = 2; }
-    return ("000" + number).slice(length * -1);
-};
-export var int = function (bool) { return (bool === true ? 1 : 0); };
-export function debounce(fn, wait) {
-    var t;
-    return function () {
-        var _this = this;
-        var args = arguments;
-        clearTimeout(t);
-        t = setTimeout(function () { return fn.apply(_this, args); }, wait);
-    };
-}
-export var arrayify = function (obj) {
-    return obj instanceof Array ? obj : [obj];
-};
+export var pad=function(r,n){return void 0===n&&(n=2),("000"+r).slice(-1*n)};export var int=function(r){return!0===r?1:0};export function debounce(r,n){var t;return function(){var e=this,o=arguments;clearTimeout(t),t=setTimeout((function(){return r.apply(e,o)}),n)}}export var arrayify=function(r){return r instanceof Array?r:[r]};

@@ -12,9 +12,7 @@ JS_BUILD_DIR = os.path.join(ROOT_DIR, "public/js-mini")
 
 def create_dir(dir_path):
     # Check if the directory exists
-    if os.path.exists(dir_path):
-        print(f'Directory \'{dir_path}\' already exists.')
-    else:
+    if os.path.exists(dir_path) == False:
         # Create the directory
         os.makedirs(os.path.join(dir_path), exist_ok=True)
         print(f"Directory '{dir_path}' created successfully!")
@@ -28,17 +26,15 @@ def run_command(command):
         print(f'Command \'{command}\' failed 🛑 with error: \n{e.stderr}')
 
 def build_js():
-    print(f'Compiling all typescript files...')
-    run_command('npm run tsc:build')
+    print('Compiling TS file ...')
+    run_command('npm run tsc:compile')
+    print('Build JS file ...')
     for file in os.listdir(JS_DIR):
         if file.endswith('.js') and file in TS_FILES_TO_COMPILE:
             create_dir(JS_BUILD_DIR)
-            print(f'Compiling \'{file}\'')
             file_path = os.path.join(JS_DIR, file)
             file_name = os.path.splitext(file)[0]
             output_path = os.path.join(JS_BUILD_DIR, f'{file_name}.min.js')
             run_command(f'terser -c -m -o {output_path} -- {file_path}')
 
-print(f'Start building JS assets...')
 build_js()
-print(f'End building JS assets...')

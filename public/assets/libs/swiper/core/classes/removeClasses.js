@@ -1,9 +1,1 @@
-export default function removeClasses() {
-  const swiper = this;
-  const {
-    el,
-    classNames
-  } = swiper;
-  el.classList.remove(...classNames);
-  swiper.emitContainerClasses();
-}
+export default function removeClasses(){const{el:s,classNames:e}=this;s.classList.remove(...e),this.emitContainerClasses()}

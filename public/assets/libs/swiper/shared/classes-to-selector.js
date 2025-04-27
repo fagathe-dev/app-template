@@ -1,4 +1,1 @@
-export default function classesToSelector(classes = '') {
-  return `.${classes.trim().replace(/([\.:!+\/])/g, '\\$1') // eslint-disable-line
-  .replace(/ /g, '.')}`;
-}
+export default function classesToSelector(e=""){return`.${e.trim().replace(/([\.:!+\/])/g,"\\$1").replace(/ /g,".")}`}

@@ -1,16 +1,1 @@
-import transitionEmit from './transitionEmit.js';
-export default function transitionEnd(runCallbacks = true, direction) {
-  const swiper = this;
-  const {
-    params
-  } = swiper;
-  swiper.animating = false;
-  if (params.cssMode) return;
-  swiper.setTransition(0);
-  transitionEmit({
-    swiper,
-    runCallbacks,
-    direction,
-    step: 'End'
-  });
-}
+import transitionEmit from"./transitionEmit.js";export default function transitionEnd(t=!0,i){const n=this,{params:s}=n;n.animating=!1,s.cssMode||(n.setTransition(0),transitionEmit({swiper:n,runCallbacks:t,direction:i,step:"End"}))}

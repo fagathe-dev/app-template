@@ -1,5 +1,1 @@
-import { createLocalOrUTC } from './from-anything';
-
-export function createUTC (input, format, locale, strict) {
-    return createLocalOrUTC(input, format, locale, strict, true).utc();
-}
+import{createLocalOrUTC}from"./from-anything";export function createUTC(r,t,e,c){return createLocalOrUTC(r,t,e,c,!0).utc()}

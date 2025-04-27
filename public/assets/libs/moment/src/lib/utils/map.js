@@ -1,7 +1,1 @@
-export default function map(arr, fn) {
-    var res = [], i;
-    for (i = 0; i < arr.length; ++i) {
-        res.push(fn(arr[i], i));
-    }
-    return res;
-}
+export default function map(r,t){var e,n=[];for(e=0;e<r.length;++e)n.push(t(r[e],e));return n}
