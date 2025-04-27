@@ -1,3 +1,1 @@
-export default function isUndefined(input) {
-    return input === void 0;
-}
+export default function isUndefined(e){return void 0===e}

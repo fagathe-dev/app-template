@@ -1,3 +1,1 @@
-export default function isNumber(input) {
-    return typeof input === 'number' || Object.prototype.toString.call(input) === '[object Number]';
-}
+export default function isNumber(t){return"number"==typeof t||"[object Number]"===Object.prototype.toString.call(t)}

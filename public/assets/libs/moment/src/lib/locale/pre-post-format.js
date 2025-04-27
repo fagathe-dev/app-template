@@ -1,3 +1,1 @@
-export function preParsePostFormat (string) {
-    return string;
-}
+export function preParsePostFormat(r){return r}

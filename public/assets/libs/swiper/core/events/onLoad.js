@@ -1,9 +1,1 @@
-import { processLazyPreloader } from '../../shared/process-lazy-preloader.js';
-export default function onLoad(e) {
-  const swiper = this;
-  processLazyPreloader(swiper, e.target);
-  if (swiper.params.cssMode || swiper.params.slidesPerView !== 'auto' && !swiper.params.autoHeight) {
-    return;
-  }
-  swiper.update();
-}
+import{processLazyPreloader}from"../../shared/process-lazy-preloader.js";export default function onLoad(a){const e=this;processLazyPreloader(e,a.target),e.params.cssMode||"auto"!==e.params.slidesPerView&&!e.params.autoHeight||e.update()}

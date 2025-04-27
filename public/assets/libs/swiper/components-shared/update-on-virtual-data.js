@@ -1,9 +1,1 @@
-export const updateOnVirtualData = swiper => {
-  if (!swiper || swiper.destroyed || !swiper.params.virtual || swiper.params.virtual && !swiper.params.virtual.enabled) return;
-  swiper.updateSlides();
-  swiper.updateProgress();
-  swiper.updateSlidesClasses();
-  if (swiper.parallax && swiper.params.parallax && swiper.params.parallax.enabled) {
-    swiper.parallax.setTranslate();
-  }
-};
+export const updateOnVirtualData=a=>{!a||a.destroyed||!a.params.virtual||a.params.virtual&&!a.params.virtual.enabled||(a.updateSlides(),a.updateProgress(),a.updateSlidesClasses(),a.parallax&&a.params.parallax&&a.params.parallax.enabled&&a.parallax.setTranslate())};

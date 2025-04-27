@@ -1,17 +1,1 @@
-import { elementChildren } from '../../shared/utils.js';
-export default function loopCreate(slideRealIndex) {
-  const swiper = this;
-  const {
-    params,
-    slidesEl
-  } = swiper;
-  if (!params.loop || swiper.virtual && swiper.params.virtual.enabled) return;
-  const slides = elementChildren(slidesEl, `.${params.slideClass}, swiper-slide`);
-  slides.forEach((el, index) => {
-    el.setAttribute('data-swiper-slide-index', index);
-  });
-  swiper.loopFix({
-    slideRealIndex,
-    direction: params.centeredSlides ? undefined : 'next'
-  });
-}
+import{elementChildren}from"../../shared/utils.js";export default function loopCreate(e){const i=this,{params:l,slidesEl:t}=i;if(!l.loop||i.virtual&&i.params.virtual.enabled)return;elementChildren(t,`.${l.slideClass}, swiper-slide`).forEach(((e,i)=>{e.setAttribute("data-swiper-slide-index",i)})),i.loopFix({slideRealIndex:e,direction:l.centeredSlides?void 0:"next"})}

@@ -1,16 +1,1 @@
-import appendSlide from './methods/appendSlide.js';
-import prependSlide from './methods/prependSlide.js';
-import addSlide from './methods/addSlide.js';
-import removeSlide from './methods/removeSlide.js';
-import removeAllSlides from './methods/removeAllSlides.js';
-export default function Manipulation({
-  swiper
-}) {
-  Object.assign(swiper, {
-    appendSlide: appendSlide.bind(swiper),
-    prependSlide: prependSlide.bind(swiper),
-    addSlide: addSlide.bind(swiper),
-    removeSlide: removeSlide.bind(swiper),
-    removeAllSlides: removeAllSlides.bind(swiper)
-  });
-}
+import appendSlide from"./methods/appendSlide.js";import prependSlide from"./methods/prependSlide.js";import addSlide from"./methods/addSlide.js";import removeSlide from"./methods/removeSlide.js";import removeAllSlides from"./methods/removeAllSlides.js";export default function Manipulation({swiper:e}){Object.assign(e,{appendSlide:appendSlide.bind(e),prependSlide:prependSlide.bind(e),addSlide:addSlide.bind(e),removeSlide:removeSlide.bind(e),removeAllSlides:removeAllSlides.bind(e)})}

@@ -1,18 +1,1 @@
-import { createElement, elementChildren } from './utils.js';
-export default function createElementIfNotDefined(swiper, originalParams, params, checkProps) {
-  if (swiper.params.createElements) {
-    Object.keys(checkProps).forEach(key => {
-      if (!params[key] && params.auto === true) {
-        let element = elementChildren(swiper.el, `.${checkProps[key]}`)[0];
-        if (!element) {
-          element = createElement('div', checkProps[key]);
-          element.className = checkProps[key];
-          swiper.el.append(element);
-        }
-        params[key] = element;
-        originalParams[key] = element;
-      }
-    });
-  }
-  return params;
-}
+import{createElement,elementChildren}from"./utils.js";export default function createElementIfNotDefined(e,t,l,n){return e.params.createElements&&Object.keys(n).forEach((r=>{if(!l[r]&&!0===l.auto){let a=elementChildren(e.el,`.${n[r]}`)[0];a||(a=createElement("div",n[r]),a.className=n[r],e.el.append(a)),l[r]=a,t[r]=a}})),l}

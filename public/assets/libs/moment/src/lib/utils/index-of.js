@@ -1,18 +1,1 @@
-var indexOf;
-
-if (Array.prototype.indexOf) {
-    indexOf = Array.prototype.indexOf;
-} else {
-    indexOf = function (o) {
-        // I know
-        var i;
-        for (i = 0; i < this.length; ++i) {
-            if (this[i] === o) {
-                return i;
-            }
-        }
-        return -1;
-    };
-}
-
-export { indexOf as default };
+var indexOf;indexOf=Array.prototype.indexOf?Array.prototype.indexOf:function(r){var e;for(e=0;e<this.length;++e)if(this[e]===r)return e;return-1};export{indexOf as default};

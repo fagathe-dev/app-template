@@ -1,17 +1,1 @@
-import { getWindow, getDocument } from 'ssr-window';
-let support;
-function calcSupport() {
-  const window = getWindow();
-  const document = getDocument();
-  return {
-    smoothScroll: document.documentElement && document.documentElement.style && 'scrollBehavior' in document.documentElement.style,
-    touch: !!('ontouchstart' in window || window.DocumentTouch && document instanceof window.DocumentTouch)
-  };
-}
-function getSupport() {
-  if (!support) {
-    support = calcSupport();
-  }
-  return support;
-}
-export { getSupport };
+import{getWindow,getDocument}from"ssr-window";let support;function calcSupport(){const t=getWindow(),o=getDocument();return{smoothScroll:o.documentElement&&o.documentElement.style&&"scrollBehavior"in o.documentElement.style,touch:!!("ontouchstart"in t||t.DocumentTouch&&o instanceof t.DocumentTouch)}}function getSupport(){return support||(support=calcSupport()),support}export{getSupport};
