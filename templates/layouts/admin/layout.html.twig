@@ -22,6 +22,7 @@
   <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
   <!-- custom Css-->
   <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+  {% block stylesheets %}{% endblock %}
 
 </head>
 
@@ -42,6 +43,8 @@
         <div class="container-fluid">
 
           {{ include('layouts/admin/page-title.html.twig', {pagetitle: 'Pages', title: 'Starter'}) }}
+
+          {% block content %}{% endblock %}
 
         </div>
         <!-- container-fluid -->
@@ -64,6 +67,7 @@
   <script src="assets/js/plugins.js"></script>
   <!-- App js -->
   <script src="assets/js/app.js"></script>
+  {% block javascripts %}{% endblock %}
 </body>
 
 </html>
