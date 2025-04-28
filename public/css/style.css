@@ -1,1 +1,32 @@
-
+.layout-wrapper.landing {
+  width: 100%;
+  overflow-x: hidden;
+}
+.layout-wrapper.landing .profile-setting-img {
+  min-height: 150px;
+  max-height: 260px;
+}
+@media screen and (max-width: 600px) {
+  .layout-wrapper.landing .profile-setting-img {
+    height: 300px;
+    max-height: unset;
+  }
+}
+@media screen and (max-width: 500px) {
+  .layout-wrapper.landing .profile-setting-img {
+    height: 350px;
+  }
+}
+@media screen and (max-width: 400px) {
+  .layout-wrapper.landing .profile-setting-img {
+    height: 400px;
+  }
+}
+.layout-wrapper.landing .profile-setting-img .overlay-content {
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  flex-flow: column;
+  justify-content: end;
+}

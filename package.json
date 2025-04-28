@@ -39,6 +39,7 @@
     "dev": "encore dev",
     "watch": "encore dev --watch",
     "build": "encore production --progress",
+    "sass": "sass --no-source-map --watch public/scss/style.scss public/css/style.css",
     "tsc": "tsc --watch",
     "tsc:compile": "tsc",
     "tsc:build": "tsc && ./build.py",
