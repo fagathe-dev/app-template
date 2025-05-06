@@ -57,7 +57,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
-            "Fagathe\\Libs\\": "libs/"
+            "Fagathe\\Libs\\": "libs/src/"
         }
     },
     "autoload-dev": {
