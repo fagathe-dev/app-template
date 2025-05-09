@@ -2,4 +2,15 @@
 
 namespace Fagathe\Libs\Logger;
 
-final class LoggerTemplate {}
+use Fagathe\Libs\Logger\Log;
+
+final class LoggerTemplate {
+
+
+
+
+    public function generateTemplate(Log $log): string
+    {
+        return '';
+    }
+}
