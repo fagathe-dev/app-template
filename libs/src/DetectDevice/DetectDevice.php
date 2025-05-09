@@ -20,6 +20,18 @@ final class DetectDevice
         $this->detect->setUserAgent($this->request->headers->get('User-Agent'));
     }
 
+    /**
+     * Determines the type of device being used (e.g., mobile, tablet, desktop).
+     *
+     * @return string The type of device as a string.
+     *
+     * @example
+     * ```php
+     * $detectDevice = new DetectDevice();
+     * $deviceType = $detectDevice->getDeviceType();
+     * echo $deviceType; // Output: "mobile", "tablet", or "desktop"
+     * ```
+     */
     public function getDeviceType(): string
     {
         $device = match (true) {
@@ -32,6 +44,21 @@ final class DetectDevice
         return $device->value;
     }
 
+    /**
+     * Retrieves the name of the browser being used.
+     *
+     * This method detects and returns the browser name as a string.
+     *
+     * @return string The name of the browser.
+     *
+     * @example
+     * ```php
+     * $detectDevice = new DetectDevice();
+     * $browser = $detectDevice->getBrowser();
+     * echo "Browser: " . $browser;
+     * // Output: Browser: Chrome (example output, actual result depends on the user's browser)
+     * ```
+     */
     public function getBrowser(): string
     {
         $browser = match (true) {
