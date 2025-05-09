@@ -5,3 +5,62 @@ Website: https://themesbrand.com/
 Contact: support@themesbrand.com
 File: Custom Css File
 */
+
+.snackbar {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+
+  width: 100%;
+  max-width: 300px;
+  min-height: 0;
+  height: auto;
+  max-height: 450px;
+
+  overflow-y: auto;
+
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 5px;
+
+  .alert {
+    margin-bottom: 0;
+    .btn-close {
+      --vz-btn-close-color: #fff;
+    }
+    &.alert-warning {
+      .btn-close {
+        --vz-btn-close-color: #000;
+      }
+    }
+  }
+}
+
+.image-preview {
+  margin: 1rem auto;
+  height: auto;
+  width: 100%;
+  max-width: 650px;
+  box-shadow: -2px 2px 16px 0 rgba(0, 0, 0, 0.25);
+}
+.pdf-preview {
+  margin: 1rem auto;
+  min-height: 500px;
+  height: auto;
+  width: 100%;
+  border: none;
+}
+.video-preview {
+  margin: 1rem auto;
+  width: 100%;
+}
+video.video-preview {
+  width: 100%;
+  max-width: 650px;
+  box-shadow: -2px 2px 16px 0 rgba(0, 0, 0, 0.25);
+  height: auto;
+}
+.audio-preview {
+  margin: 1rem auto;
+  width: 100%;
+}
