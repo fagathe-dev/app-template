@@ -1,11 +1,16 @@
 <?php
 
+namespace Fagathe\Libs\Logger;
+
+use DateTimeImmutable;
+
 final class Log
 {
     private string $level;
+    private string $name;
     private string $content;
     private array $context = [];
-    private DateTimeImmutable $timestamp;
+    private DateTimeImmutablee $timestamp;
 
     public function __construct() {}
 
@@ -28,6 +33,29 @@ final class Log
     public function setLevel(string $level): self
     {
         $this->level = $level;
+
+        return $this;
+    }
+
+    /**
+     * Gets the log name.
+     *
+     * @return string The log name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets the log name.
+     *
+     * @param string $name The log name to set.
+     * @return self
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }
