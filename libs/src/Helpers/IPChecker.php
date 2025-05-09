@@ -53,7 +53,7 @@ final class IPChecker
         $ipAddress = $ip['origin'];
 
         // Create a cookie to store the IP address; expires in 1800 seconds (30 minutes)
-        setcookie(self::IP_COOKIE_NAME, self::ENCODING_PREFIX . base64_encode($ipAddress), time() + 1800, "/", $this->domainChecker->getMainDomain(), true);
+        setcookie(self::IP_COOKIE_NAME, self::ENCODING_PREFIX . base64_encode($ipAddress), time() + 60 * 60, "/", $this->domainChecker->getMainDomain(), true);
 
         return $ipAddress;
     }
