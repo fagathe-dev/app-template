@@ -203,7 +203,7 @@ final class JsonService implements JsonPersistInterface
             $this->persist($updatedData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            #   TODO: Implement a logger
+            # TODO: Implement a logger
             // For now, we'll just echo the error message
             echo 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage();
         }
