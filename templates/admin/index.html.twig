@@ -5,38 +5,7 @@
 {% endblock %}
 
 {% block body %}
-{{ log|raw }}
-<div class="row">
-  <div class="col-lg-12">
-      <div class="card">
-          <div class="card-header align-items-center d-flex" data-bs-toggle="collapse" data-bs-target="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-              <div class="flex-grow-1">
-                  <p class="card-text mb-0">
-                    <strong class="text-danger">ERROR</strong>
-                    &nbsp;-&nbsp;
-                    <span>IP : 64.163.90.200</span>
-                    &nbsp;-&nbsp;
-                    <span>{{ 'now'|date('d-m-Y H:i:s') }}</span>
-                    &nbsp;-&nbsp;
-                    <span>
-                      https://api.example.com/v1/endpoint
-                    </span>
-                  </p>
-                  
-              </div>
-          </div><!-- end card header -->
-
-          <div class="card-body collapse" id="collapseExample">
-              <p class="text-dark fw-bold">Datas :</p>
-              <div class="live-preview">
-                <pre><code class="language-json">{{ content|raw }}</code></pre>
-              </div>
-            </div><!-- end card-body -->
-        </div><!-- end card -->
-    </div>
-    <!-- end col -->
-</div>
-<!-- end row -->
+  {{ log|raw }}
 {% endblock %}
 
 {% block javascripts %}
