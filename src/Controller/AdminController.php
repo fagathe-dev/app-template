@@ -24,14 +24,13 @@ class AdminController extends AbstractController
             'age' => 30,
             'email' => 'email@domain.com'
         ];
-        dump($request->getSchemeAndHttpHost());
-        $content = htmlentities(json_encode($person, JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8');
+
         $log = (new Log())
             ->setLevel(LoggerLevelEnum::Info)
             ->setTimestamp(new \DateTimeImmutable())
             ->addContext('ip', $this->ipchecker->getIp()) # '66.39.189.44') 
-            ->addContext('device', $this->detectDevice->getDeviceType())
-            ->addContext('browser', $this->detectDevice->getBrowser())
+            ->addContext('device', $this->detectDevice->getDeviceType()->value)
+            ->addContext('browser', $this->detectDevice->getBrowser()->value)
             ->addContext('action', 'Admin page accessed')
             ->addContext('user_id', 'fagathe77@gmail.com')
             ->addContent('data', $person)
