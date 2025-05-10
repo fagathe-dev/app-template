@@ -99,11 +99,11 @@ final class LoggerTemplate
         $content = '';
         if ($this->log->hasContext('browser') && $this->log->hasContext('device')) {
             $device = match ($this->log->getContext('device')) {
-                DeviceEnum::Mobile => static::PHONE_ICON,
-                DeviceEnum::Tablet => static::TABLET_ICON,
+                DeviceEnum::Mobile->value => static::PHONE_ICON,
+                DeviceEnum::Tablet->value => static::TABLET_ICON,
                 default => static::DESKTOP_ICON,
             };
-            $browser = $this->log->getContext('browser')->value;
+            $browser = $this->log->getContext('browser');
             $parts[] = '<span><i class="' . $device . '"></i>&nbsp;:&nbsp;' . $browser . '</span>';
         }
 
