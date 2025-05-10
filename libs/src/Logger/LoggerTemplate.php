@@ -89,6 +89,7 @@ final class LoggerTemplate
             LoggerLevelEnum::Warning => 'warning',
             default => 'info',
         };
+        $extra = '';
 
         if ($this->hasContent()) {
             $extra = ' data-bs-toggle="collapse" data-bs-target="#' . $this->getHtmlID() . '" role="button" aria-expanded="false" aria-controls="' . $this->getHtmlID() . '"';

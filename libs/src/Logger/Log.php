@@ -11,12 +11,12 @@ final class Log
 
     public const CONTENT_KEYS = ['data', 'exception', 'message', 'ws_return'];
 
-    private LoggerLevelEnum $level;
+    private ?LoggerLevelEnum $level = null;
 
     /**
      * @var array<string, mixed> The log context.
      */
-    private array $content;
+    private array $content = [];
 
     /**
      * @var array<string, string> The log context.
@@ -26,9 +26,9 @@ final class Log
     /**
      * @var DateTimeImmutable The timestamp of the log.
      */
-    private DateTimeImmutable $timestamp;
+    private ?DateTimeImmutable $timestamp = null;
 
-    private string $origin;
+    private ?string $origin = null;
 
     public function __construct() {}
 
@@ -37,7 +37,7 @@ final class Log
      *
      * @return LoggerLevelEnum The log level.
      */
-    public function getLevel(): LoggerLevelEnum
+    public function getLevel(): ?LoggerLevelEnum
     {
         return $this->level;
     }
@@ -71,9 +71,24 @@ final class Log
      * 
      * @return array The log content.
      */
-    public function getContents(): array
+    public function getContents(): ?array
     {
         return $this->content;
+    }
+
+    /**
+     * Sets the log content.
+     *
+     * This method replaces the entire content array with the provided array.
+     *
+     * @param array<string, mixed> $content The content array to set.
+     * @return self
+     */
+    public function setContent(array $content): self
+    {
+        $this->content = $content;
+
+        return $this;
     }
 
     /**
@@ -132,9 +147,24 @@ final class Log
      * 
      * @return array The log content.
      */
-    public function getContexts(): array
+    public function getContexts(): ?array
     {
         return $this->context;
+    }
+
+    /**
+     * Sets the log context.
+     *
+     * This method replaces the entire context array with the provided array.
+     *
+     * @param array<string, string> $context The context array to set.
+     * @return self
+     */
+    public function setContext(array $context): self
+    {
+        $this->context = $context;
+
+        return $this;
     }
 
     /**
@@ -183,7 +213,7 @@ final class Log
      *
      * @return DateTimeImmutable The timestamp of the log.
      */
-    public function getTimestamp(): DateTimeImmutable
+    public function getTimestamp(): ?DateTimeImmutable
     {
         return $this->timestamp;
     }
@@ -217,7 +247,7 @@ final class Log
      *
      * @return string The origin of the log.
      */
-    public function getOrigin(): string
+    public function getOrigin(): ?string
     {
         return $this->origin;
     }
