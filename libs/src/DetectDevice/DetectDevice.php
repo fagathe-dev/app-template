@@ -23,7 +23,7 @@ final class DetectDevice
     /**
      * Determines the type of device being used (e.g., mobile, tablet, desktop).
      *
-     * @return string The type of device as a string.
+     * @return DeviceEnum The type of device as a DeviceEnum object.
      *
      * @example
      * ```php
@@ -32,7 +32,7 @@ final class DetectDevice
      * echo $deviceType; // Output: "mobile", "tablet", or "desktop"
      * ```
      */
-    public function getDeviceType(): string
+    public function getDeviceType(): DeviceEnum
     {
         $device = match (true) {
             $this->detect->isTablet() => DeviceEnum::Tablet,
@@ -41,15 +41,15 @@ final class DetectDevice
             default => DeviceEnum::Desktop,
         };
 
-        return $device->value;
+        return $device;
     }
 
     /**
      * Retrieves the name of the browser being used.
      *
-     * This method detects and returns the browser name as a string.
+     * This method detects and returns the browser as a BrowserEnum object.
      *
-     * @return string The name of the browser.
+     * @return BrowserEnum The name of the browser.
      *
      * @example
      * ```php
@@ -59,7 +59,7 @@ final class DetectDevice
      * // Output: Browser: Chrome (example output, actual result depends on the user's browser)
      * ```
      */
-    public function getBrowser(): string
+    public function getBrowser(): BrowserEnum
     {
         $browser = match (true) {
             $this->detect->isEdge() || str_contains('Edg', $this->request->get('User-Agent')) => BrowserEnum::Edge,
@@ -71,6 +71,6 @@ final class DetectDevice
             default => BrowserEnum::Unknown,
         };
 
-        return $browser->value;
+        return $browser;
     }
 }
