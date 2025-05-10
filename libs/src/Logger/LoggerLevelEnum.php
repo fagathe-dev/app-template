@@ -9,4 +9,5 @@ enum LoggerLevelEnum: string
     case Notice = 'notice';
     case Warning = 'warning';
     case Error = 'error';
+    case Critical = 'critical';
 }
