@@ -9,23 +9,30 @@ class JsonFileManager
 {
     private Filesystem $filesystem;
 
-    public function __construct(private string $filePath) {
+    public function __construct(private string $filePath, private ?array $context = null)
+    {
         $this->filesystem = new Filesystem();
+        $this->context = $context ?? [];
         $this->init();
     }
 
     private function init(): void
     {
-        if (!defined('JSON_DATA_DIR')) {
+        $dir = '/data/';
+        if (!defined('JSON_DATA_DIR') && array_key_exists('JSON_DIR', $this->context)) {
             throw new JsonFileException("La constante `JSON_DATA_DIR` n'est pas définie.");
+        } else if (array_key_exists('JSON_DIR', $this->context)) {
+            $dir = $this->context['JSON_DIR'];
+        } else if (defined('JSON_DATA_DIR')) {
+            $dir = JSON_DATA_DIR;
         }
-        $this->filePath = JSON_DATA_DIR . $this->filePath;
+        $this->filePath = $dir . $this->filePath . '.json';
 
         if (!$this->filesystem->exists($this->filePath)) {
             $this->filesystem->mkdir(dirname($this->filePath), 0755);
             $this->filesystem->touch($this->filePath);
         }
-        
+
         if (!is_writable($this->filePath)) {
             throw new JsonFileException("Le fichier JSON n'est pas accessible en écriture : {$this->filePath}");
         }

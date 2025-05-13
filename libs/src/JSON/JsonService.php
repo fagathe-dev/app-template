@@ -2,9 +2,17 @@
 
 namespace Fagathe\Libs\JSON;
 
-final class JsonService implements JsonPersistInterface
+class JsonService implements JsonPersistInterface
 {
-    public function __construct(private string $filePath) {}
+
+    private JsonFileManager $jsonFileManager;
+
+
+    public function __construct(private string $filePath, private ?array $context = null)
+    {
+        $this->jsonFileManager = new JsonFileManager($this->filePath, $this->context);
+    }
+
 
     /**
      * Persists the given data to the JSON file.
@@ -21,8 +29,7 @@ final class JsonService implements JsonPersistInterface
     {
         try {
             $data = array_values($data);
-            $jsonFileManager = new JsonFileManager($this->filePath);
-            $jsonFileManager->write($data);
+            $this->jsonFileManager->write($data);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
             // TODO: Implement a logger
@@ -80,8 +87,7 @@ final class JsonService implements JsonPersistInterface
     public function findAll(): ?array
     {
         try {
-            $jsonFileManager = new JsonFileManager($this->filePath);
-            return $jsonFileManager->read();
+            return $this->jsonFileManager->read();
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
             # TODO: Implement a logger
@@ -144,7 +150,10 @@ final class JsonService implements JsonPersistInterface
             if ($existingData === null) {
                 $existingData = [];
             }
-            $existingData[] = [$identifier => $this->getLastIndex($identifier), ...$data];
+            if (!array_key_exists($identifier, $data)) {
+                $data[$identifier] = $this->getLastIndex($identifier);
+            }
+            array_push($existingData, $data);
             $this->persist($existingData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)

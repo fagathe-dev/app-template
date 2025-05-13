@@ -11,6 +11,8 @@ final class Log
 
     public const CONTENT_KEYS = ['data', 'exception', 'message', 'ws_return'];
 
+    private string|int|null $id = null;
+
     private ?LoggerLevelEnum $level = null;
 
     /**
@@ -31,6 +33,29 @@ final class Log
     private ?string $origin = null;
 
     public function __construct() {}
+
+    /**
+     * Gets the log ID.
+     *
+     * @return string|int|null The log ID.
+     */
+    public function getId(): string|int|null
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets the log ID.
+     *
+     * @param string|int $id The log ID to set.
+     * @return self
+     */
+    public function setId(string|int|null $id = null): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     /**
      * Gets the log level.

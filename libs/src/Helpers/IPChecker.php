@@ -13,7 +13,10 @@ final class IPChecker
 {
     public const IP_COOKIE_NAME = '_ffr_v4';
     public const ENCODING_PREFIX = 'FAG_.';
-    public function __construct(private DomainChecker $domainChecker) {}
+    private DomainChecker $domainChecker;
+    public function __construct() {
+        $this->domainChecker = new DomainChecker();
+    }
 
     /**
      * Retrieves the public IPv4 address of the user.

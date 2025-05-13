@@ -41,7 +41,6 @@ final class JsonSerializer
         foreach ($properties as $property) {
             $property->setAccessible(true);
             $value = $property->getValue($object);
-            dump(gettype($value));
             if (gettype($value) === 'object') {
                 $propRefection = new ReflectionClass($value);
                 if ($value instanceof DateTimeImmutable) {
