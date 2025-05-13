@@ -6,6 +6,7 @@ use Fagathe\Libs\DetectDevice\DetectDevice;
 use Fagathe\Libs\Helpers\IPChecker;
 use Fagathe\Libs\JSON\JsonSerializer;
 use Fagathe\Libs\Logger\Log;
+use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,11 +43,7 @@ class AdminController extends AbstractController
             'level' => 'info',
             'timestamp' => '2025-05-10 14:30:45',
             'context' => [
-                'ip' => $this->ipchecker->getIp(), // '66.39.189.44'
-                'device' => $this->detectDevice->getDeviceType()->value,
-                'browser' => $this->detectDevice->getBrowser()->value,
                 'action' => 'Admin page accessed',
-                'user_id' => 'fagathe77@gmail.com',
             ],
             'content' => [
                 'data' => $person,
@@ -54,6 +51,9 @@ class AdminController extends AbstractController
             ],
             'origin' => $request->getSchemeAndHttpHost() . $request->getPathInfo(),
         ];
+
+        $logger = new Logger('admin/consultation');
+        $logger->info($log['content'], $log['context']);
         $log = $this->jsonSerializer->denormalize($log, Log::class);
         $log = $log->generate();
         // dd($log->generate());
