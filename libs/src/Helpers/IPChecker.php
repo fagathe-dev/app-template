@@ -11,10 +11,11 @@ namespace Fagathe\Libs\Helpers;
  */
 final class IPChecker
 {
-    public const IP_COOKIE_NAME = '_ffr_v4';
+    public const IP_COOKIE_NAME = '__ffr_v4';
     public const ENCODING_PREFIX = 'FAG_.';
     private DomainChecker $domainChecker;
-    public function __construct() {
+    public function __construct()
+    {
         $this->domainChecker = new DomainChecker();
     }
 

@@ -17,7 +17,8 @@ final class Logger
     private JsonSerializer $jsonSerializer;
     private DetectDevice $detectDevice;
     private IPChecker $ipChecker;
-    private Session $session;
+    public const LOG_CONTEXT = '__ffr_cv4';
+    public const LOG_UUID = '__ffr_ui4';
 
     public function __construct(private string $filePath)
     {
@@ -35,8 +36,6 @@ final class Logger
         $this->jsonSerializer = new JsonSerializer();
         $this->detectDevice = new DetectDevice();
         $this->ipChecker = new IPChecker();
-        $this->session = new Session();
-        $this->session->start();
     }
 
     /**
@@ -153,10 +152,6 @@ final class Logger
             }
         }
 
-        if ($this->getUserContext() !== null) {
-            $log->addContext('user_id', $this->getUserContext());
-        }
-
         $log = $this->jsonSerializer->normalize($log);
 
 
@@ -168,23 +163,38 @@ final class Logger
      */
     private function getContext(): array
     {
-        return [
-            'ip' => $this->ipChecker->getIp(), // (eg. '66.39.189.44')
-            'device' => $this->detectDevice->getDeviceType()->value,
-            'browser' => $this->detectDevice->getBrowser()->value,
-        ];
-    }
+        $context = [];
+        $emailSession = isset($_SESSION[static::LOG_UUID]) ? base64_decode($_SESSION[static::LOG_UUID]) : null;
+        $context['uid'] = 'anonymous';
+        $boolRenewContext = false;
 
-    /**
-     * @return string|null
-     */
-    private function getUserContext(): ?string
-    {
-        if (!$this->session->has('userContext')) {
-            return null;
+        if ($emailSession !== null) {
+            $context['uid'] = $emailSession;
         }
 
-        return $this->session->get('userContext'); # TODO: Définir une constante dans l'authenticator pour l'ID de l'utilisateur
+        if (isset($_COOKIE[static::LOG_CONTEXT])) {
+            $context = json_decode(base64_decode($_COOKIE[static::LOG_CONTEXT]), true);
+
+            if (isset($context['uid']) && $context['uid'] !== 'anonymous' && $emailSession !== null) {
+                $boolRenewContext = true;
+            }
+        } else {
+            $boolRenewContext = true;
+        }
+
+        if ($boolRenewContext && count($context) < 2) {
+
+            $context = [
+                ...$context,
+                'ip' => $this->ipChecker->getIp(), // (eg. '66.39.189.44')
+                'device' => $this->detectDevice->getDeviceType()->value,
+                'browser' => $this->detectDevice->getBrowser()->value,
+            ];
+
+            setcookie(static::LOG_CONTEXT, base64_encode(json_encode($context)), time() + 60 * 60, "/", $this->request->getHost(), true);
+        }
+
+        return $context;
     }
 
     /**

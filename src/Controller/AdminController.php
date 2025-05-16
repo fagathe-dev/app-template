@@ -34,7 +34,7 @@ class AdminController extends AbstractController
         //     ->addContext('device', $this->detectDevice->getDeviceType()->value)
         //     ->addContext('browser', $this->detectDevice->getBrowser()->value)
         //     ->addContext('action', 'Admin page accessed')
-        //     ->addContext('user_id', 'fagathe77@gmail.com')
+        //     ->addContext('uid', 'fagathe77@gmail.com')
         //     ->addContent('data', $person)
         //     ->addContent('message', 'Admin page accessed successfully')
         //     ->setOrigin($request->getSchemeAndHttpHost() . $request->getPathInfo())
@@ -58,6 +58,6 @@ class AdminController extends AbstractController
         $log = $log->generate();
         // dd($log->generate());
 
-        return $this->render('admin/index.html.twig', compact( 'log'));
+        return $this->render('admin/index.html.twig', compact('log'));
     }
 }
