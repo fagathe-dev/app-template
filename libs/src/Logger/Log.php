@@ -7,7 +7,7 @@ use Fagathe\Libs\Logger\LoggerLevelEnum;
 
 final class Log
 {
-    public const CONTEXT_KEYS = ['ip', 'device', 'browser', 'action', 'user_id'];
+    public const CONTEXT_KEYS = ['ip', 'device', 'browser', 'action', 'uid'];
 
     public const CONTENT_KEYS = ['data', 'exception', 'message', 'ws_return'];
 

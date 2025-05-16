@@ -73,7 +73,7 @@ final class LoggerTemplate
      */
     private function hasContent(): bool
     {
-        return $this->log->hasContext('action') || $this->log->hasContext('user_id') || is_array($this->log->getContents() && count($this->log->getContents()) > 0);
+        return $this->log->hasContext('action') || $this->log->hasContext('uid') || is_array($this->log->getContents() && count($this->log->getContents()) > 0);
     }
 
     /**
@@ -135,8 +135,8 @@ final class LoggerTemplate
         $titleClass = 'text-dark fw-bold';
         $withoutMarginBottom = $titleClass . ' ' . static::NO_MARGIN_BOTTOM_CLASS;
 
-        if ($this->log->hasContext('user_id')) {
-            $html .= '<p class="' . $withoutMarginBottom . '">Utilisateur : </p><p>' . $this->log->getContext('user_id') . '<p>';
+        if ($this->log->hasContext('uid')) {
+            $html .= '<p class="' . $withoutMarginBottom . '">Utilisateur : </p><p>' . $this->log->getContext('uid') . '<p>';
         }
 
         if ($this->log->hasContent('message')) {
