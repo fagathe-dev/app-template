@@ -128,7 +128,6 @@ final class IPChecker
      */
     private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
     {
-        echo 'Logging: ' . '</br>';
         $logger = new Logger(static::LOG_FILE, boolLogIP: false);
         $logger->log($level, $content, $context);
     }

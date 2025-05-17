@@ -28,6 +28,7 @@ class AdminController extends AbstractController
         ];
 
         $log = [
+            'level' => 'info',
             'context' => [
                 'action' => 'Admin page accessed',
             ],
@@ -36,6 +37,7 @@ class AdminController extends AbstractController
                 'message' => 'Admin page accessed successfully',
             ],
             'origin' => $request->getSchemeAndHttpHost() . $request->getPathInfo(),
+            'timestamp' => date('Y-m-d H:i:s'),
         ];
 
         $logger = new Logger('admin/consultation');
