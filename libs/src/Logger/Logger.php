@@ -20,7 +20,7 @@ final class Logger
     public const LOG_CONTEXT = '__ffr_cv4';
     public const LOG_UUID = '__ffr_ui4';
 
-    public function __construct(private string $filePath)
+    public function __construct(private string $filePath, private bool $boolLogIP = true)
     {
         $this->init();
     }
@@ -154,7 +154,6 @@ final class Logger
 
         $log = $this->jsonSerializer->normalize($log);
 
-
         $this->jsonLogService->add($log);
     }
 
@@ -164,6 +163,7 @@ final class Logger
     private function getContext(): array
     {
         $context = [];
+
         $emailSession = isset($_SESSION[static::LOG_UUID]) ? base64_decode($_SESSION[static::LOG_UUID]) : null;
         $context['uid'] = 'anonymous';
         $boolRenewContext = false;
@@ -173,6 +173,7 @@ final class Logger
         }
 
         if (isset($_COOKIE[static::LOG_CONTEXT])) {
+
             $context = json_decode(base64_decode($_COOKIE[static::LOG_CONTEXT]), true);
 
             if (isset($context['uid']) && $context['uid'] !== 'anonymous' && $emailSession !== null) {
@@ -184,9 +185,12 @@ final class Logger
 
         if ($boolRenewContext && count($context) < 2) {
 
+            if ($this->boolLogIP) {
+                $context['ip'] = $this->ipChecker->getIp();
+            }
+            
             $context = [
                 ...$context,
-                'ip' => $this->ipChecker->getIp(), // (eg. '66.39.189.44')
                 'device' => $this->detectDevice->getDeviceType()->value,
                 'browser' => $this->detectDevice->getBrowser()->value,
             ];
