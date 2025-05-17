@@ -27,21 +27,8 @@ class AdminController extends AbstractController
             'email' => 'email@domain.com'
         ];
 
-        // $log = (new Log())
-        //     ->setLevel(LoggerLevelEnum::Info)
-        //     ->setTimestamp(new \DateTimeImmutable())
-        //     ->addContext('ip', $this->ipchecker->getIp()) # '66.39.189.44') 
-        //     ->addContext('device', $this->detectDevice->getDeviceType()->value)
-        //     ->addContext('browser', $this->detectDevice->getBrowser()->value)
-        //     ->addContext('action', 'Admin page accessed')
-        //     ->addContext('uid', 'fagathe77@gmail.com')
-        //     ->addContent('data', $person)
-        //     ->addContent('message', 'Admin page accessed successfully')
-        //     ->setOrigin($request->getSchemeAndHttpHost() . $request->getPathInfo())
-        // ->generate();
         $log = [
             'level' => 'info',
-            'timestamp' => '2025-05-10 14:30:45',
             'context' => [
                 'action' => 'Admin page accessed',
             ],
@@ -50,13 +37,13 @@ class AdminController extends AbstractController
                 'message' => 'Admin page accessed successfully',
             ],
             'origin' => $request->getSchemeAndHttpHost() . $request->getPathInfo(),
+            'timestamp' => date('Y-m-d H:i:s'),
         ];
 
         $logger = new Logger('admin/consultation');
         $logger->info($log['content'], $log['context']);
         $log = $this->jsonSerializer->denormalize($log, Log::class);
         $log = $log->generate();
-        // dd($log->generate());
 
         return $this->render('admin/index.html.twig', compact('log'));
     }

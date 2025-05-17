@@ -2,6 +2,9 @@
 
 namespace Fagathe\Libs\Helpers;
 
+use Fagathe\Libs\Logger\Logger;
+use Fagathe\Libs\Logger\LoggerLevelEnum;
+
 /**
  * Class IPChecker
  *
@@ -13,6 +16,8 @@ final class IPChecker
 {
     public const IP_COOKIE_NAME = '__ffr_v4';
     public const ENCODING_PREFIX = 'FAG_.';
+
+    private const LOG_FILE = 'ip-checker/find-ip';
     private DomainChecker $domainChecker;
     public function __construct()
     {
@@ -39,6 +44,11 @@ final class IPChecker
         try {
             // create & initialize a curl session
             $curl = curl_init();
+            $this->generateLog(
+                ['message' => 'Starting cURL session to retrieve IP address'],
+                ['action' => __METHOD__],
+                LoggerLevelEnum::Debug,
+            );
 
             // set our url with curl_setopt()
             curl_setopt($curl, CURLOPT_URL, "http://httpbin.org/ip");
@@ -53,19 +63,28 @@ final class IPChecker
             // close curl resource to free up system resources
             // (deletes the variable made by curl_init)
             curl_close($curl);
-
             $ip = json_decode($output, true);
             $ipAddress = $ip['origin'];
 
+            $this->generateLog(
+                content: [
+                    'message' => 'Ending cURL session to retrieve IP address',
+                    'data' => $ipAddress
+                ],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Debug,
+            );
+
             // Create a cookie to store the IP address; expires in 1800 seconds (30 minutes)
-            setcookie(self::IP_COOKIE_NAME, self::ENCODING_PREFIX . base64_encode($ipAddress), time() + 60 * 60, "/", $this->domainChecker->getMainDomain(), true);
+            $_COOKIE[self::IP_COOKIE_NAME] = self::ENCODING_PREFIX . base64_encode($ipAddress);
 
             return $ipAddress;
         } catch (\Exception $e) {
             // Handle the exception (e.g., log it, return a default value, etc.)
-            # TODO: Implement a logger to handle the exception properly
-            // For now, we will just return an empty string or a default IP address
-            echo "Error retrieving IP address: " . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Error retrieving IP address: ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
 
         return 'unknown IP address';
@@ -89,6 +108,7 @@ final class IPChecker
     {
         // Check if the IP address is already stored in a cookie
         if (isset($_COOKIE[self::IP_COOKIE_NAME])) {
+
             $retrivedIp = $_COOKIE[self::IP_COOKIE_NAME];
             $retrivedIp = str_replace(self::ENCODING_PREFIX, '', $retrivedIp);
             // If the cookie is set, return the stored IP address
@@ -96,5 +116,19 @@ final class IPChecker
         }
 
         return $this->getUserIPv4();
+    }
+
+
+    /**
+     * @param array $content
+     * @param array $context
+     * @param LoggerLevelEnum $level
+     * 
+     * @return void
+     */
+    private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
+    {
+        $logger = new Logger(static::LOG_FILE, boolLogIP: false);
+        $logger->log($level, $content, $context);
     }
 }

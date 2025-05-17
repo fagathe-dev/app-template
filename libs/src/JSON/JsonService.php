@@ -2,8 +2,13 @@
 
 namespace Fagathe\Libs\JSON;
 
+use Fagathe\Libs\Logger\Logger;
+use Fagathe\Libs\Logger\LoggerLevelEnum;
+
 class JsonService implements JsonPersistInterface
 {
+
+    private const LOG_FILE = 'json-service/json-service';
 
     private JsonFileManager $jsonFileManager;
 
@@ -32,9 +37,10 @@ class JsonService implements JsonPersistInterface
             $this->jsonFileManager->write($data);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            // TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la sauvegarde : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -67,9 +73,10 @@ class JsonService implements JsonPersistInterface
             $filteredData = array_values($filteredData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors du filtrage des données : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
 
         return $filteredData;
@@ -90,9 +97,10 @@ class JsonService implements JsonPersistInterface
             return $this->jsonFileManager->read();
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de la lecture : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la lecture des données: ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
 
         return null;
@@ -157,9 +165,10 @@ class JsonService implements JsonPersistInterface
             $this->persist($existingData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de l\'ajout : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de l\'ajout : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -215,6 +224,10 @@ class JsonService implements JsonPersistInterface
             # TODO: Implement a logger
             // For now, we'll just echo the error message
             echo 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage();
+             $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -243,9 +256,23 @@ class JsonService implements JsonPersistInterface
             $this->persist($filteredData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de la suppression : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la suppression : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
+    }
+
+    /**
+     * @param array $content
+     * @param array $context
+     * @param LoggerLevelEnum $level
+     * 
+     * @return void
+     */
+    private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
+    {
+        $logger = new Logger(static::LOG_FILE);
+        $logger->log($level, $content, $context);
     }
 }
