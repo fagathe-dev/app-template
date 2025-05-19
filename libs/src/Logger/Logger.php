@@ -4,6 +4,7 @@ namespace Fagathe\Libs\Logger;
 
 use DateTimeImmutable;
 use Fagathe\Libs\DetectDevice\DetectDevice;
+use Fagathe\Libs\Helpers\EncodeTrait;
 use Fagathe\Libs\Helpers\IPChecker;
 use Fagathe\Libs\JSON\JsonSerializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 final class Logger
 {
+    use EncodeTrait;
 
     private Request $request;
     private JsonLogService $jsonLogService;
@@ -164,7 +166,7 @@ final class Logger
     {
         $context = [];
 
-        $emailSession = isset($_SESSION[static::LOG_UUID]) ? base64_decode($_SESSION[static::LOG_UUID]) : null;
+        $emailSession = isset($_SESSION[static::LOG_UUID]) ? $this->decodeBase64($_SESSION[static::LOG_UUID]) : null;
         $context['uid'] = 'anonymous';
         $boolRenewContext = false;
 
@@ -174,7 +176,7 @@ final class Logger
 
         if (isset($_COOKIE[static::LOG_CONTEXT])) {
 
-            $context = json_decode(base64_decode($_COOKIE[static::LOG_CONTEXT]), true);
+            $context = $this->decodeBase64($_COOKIE[static::LOG_CONTEXT]);
 
             if (isset($context['uid']) && $context['uid'] !== 'anonymous' && $emailSession !== null) {
                 $boolRenewContext = true;
