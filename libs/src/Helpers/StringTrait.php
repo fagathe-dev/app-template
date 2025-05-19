@@ -4,7 +4,7 @@ namespace Fagathe\Libs\Helpers;
 
 trait StringTrait
 {
-    
+
     /**
      * @param string $input
      * 
@@ -50,5 +50,20 @@ trait StringTrait
     public function generateToken(int $length = 50): string
     {
         return uniqid($this->generateShuffleChars($length), true);
+    }
+
+    /**
+     * Implémente une version personnalisée de wordwrap().
+     *
+     * @see https://www.php.net/manual/fr/function.wordwrap.php Documentation de wordwrap() en PHP
+     * @param string $text Texte à découper
+     * @param int $width Largeur maximale des lignes
+     * @param string $break Séparateur entre les lignes
+     * @param bool $cut Indique si les mots doivent être coupés
+     * @return string Texte formaté avec sauts de ligne
+     */
+    public function wordwrap(string $string, int $width = 75, string $break = "\n", bool $cut = false): string
+    {
+        return wordwrap($string, $width, $break, $cut);
     }
 }
