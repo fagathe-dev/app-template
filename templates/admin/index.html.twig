@@ -1,1 +1,14 @@
 {% extends "layouts/admin/layout.html.twig" %}
+
+{% block stylesheets %}
+  <script src="{{ asset('assets/libs/prismjs/themes/prism.min.css') }}"></script>
+{% endblock %}
+
+{% block body %}
+  {{ log|raw }}
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
+<script src="{{ asset('assets/js/pages/prismjs.init.js') }}"></script>
+{% endblock %}

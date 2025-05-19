@@ -2,9 +2,22 @@
 
 namespace Fagathe\Libs\JSON;
 
-final class JsonService implements JsonPersistInterface
+use Fagathe\Libs\Logger\Logger;
+use Fagathe\Libs\Logger\LoggerLevelEnum;
+
+class JsonService implements JsonPersistInterface
 {
-    public function __construct(private string $filePath) {}
+
+    private const LOG_FILE = 'json-service/json-service';
+
+    private JsonFileManager $jsonFileManager;
+
+
+    public function __construct(private string $filePath, private ?array $context = null)
+    {
+        $this->jsonFileManager = new JsonFileManager($this->filePath, $this->context);
+    }
+
 
     /**
      * Persists the given data to the JSON file.
@@ -21,13 +34,13 @@ final class JsonService implements JsonPersistInterface
     {
         try {
             $data = array_values($data);
-            $jsonFileManager = new JsonFileManager($this->filePath);
-            $jsonFileManager->write($data);
+            $this->jsonFileManager->write($data);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            // TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la sauvegarde : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -60,9 +73,10 @@ final class JsonService implements JsonPersistInterface
             $filteredData = array_values($filteredData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors du filtrage des données : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
 
         return $filteredData;
@@ -80,13 +94,13 @@ final class JsonService implements JsonPersistInterface
     public function findAll(): ?array
     {
         try {
-            $jsonFileManager = new JsonFileManager($this->filePath);
-            return $jsonFileManager->read();
+            return $this->jsonFileManager->read();
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de la lecture : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la lecture des données: ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
 
         return null;
@@ -144,13 +158,17 @@ final class JsonService implements JsonPersistInterface
             if ($existingData === null) {
                 $existingData = [];
             }
-            $existingData[] = [$identifier => $this->getLastIndex($identifier), ...$data];
+            if (!array_key_exists($identifier, $data)) {
+                $data[$identifier] = $this->getLastIndex($identifier);
+            }
+            array_push($existingData, $data);
             $this->persist($existingData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de l\'ajout : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de l\'ajout : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -203,9 +221,13 @@ final class JsonService implements JsonPersistInterface
             $this->persist($updatedData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            #   TODO: Implement a logger
+            # TODO: Implement a logger
             // For now, we'll just echo the error message
             echo 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage();
+             $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
     }
 
@@ -234,9 +256,23 @@ final class JsonService implements JsonPersistInterface
             $this->persist($filteredData);
         } catch (JsonFileException $e) {
             // Handle the exception as needed (e.g., log it, rethrow it, etc.)
-            # TODO: Implement a logger
-            // For now, we'll just echo the error message
-            echo 'Une erreur est survenue lors de la suppression : ' . $e->getMessage();
+            $this->generateLog(
+                ['message' => 'Une erreur est survenue lors de la suppression : ' . $e->getMessage()],
+                ['action' => __METHOD__]
+            );
         }
+    }
+
+    /**
+     * @param array $content
+     * @param array $context
+     * @param LoggerLevelEnum $level
+     * 
+     * @return void
+     */
+    private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
+    {
+        $logger = new Logger(static::LOG_FILE);
+        $logger->log($level, $content, $context);
     }
 }
