@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Libs\Helpers;
+namespace Fagathe\Libs\Helpers\String;
 
 trait StringTrait
 {

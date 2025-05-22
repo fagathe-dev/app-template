@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Libs\Helpers;
+namespace Fagathe\Libs\Helpers\Request;
 
 use stdClass;
 use Symfony\Component\HttpFoundation\Response;

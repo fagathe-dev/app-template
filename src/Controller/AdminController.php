@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use Fagathe\Libs\DetectDevice\DetectDevice;
-use Fagathe\Libs\Helpers\IPChecker;
-use Fagathe\Libs\JSON\JsonSerializer;
-use Fagathe\Libs\Logger\Log;
-use Fagathe\Libs\Logger\Logger;
-use Fagathe\Libs\Logger\LoggerLevelEnum;
+use App\Entity\Seo;
+use App\Entity\SeoTag;
+use Fagathe\Libs\Helpers\String\RefGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,35 +13,30 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
 
-    public function __construct(private IPChecker $ipchecker, private DetectDevice $detectDevice, private JsonSerializer $jsonSerializer) {}
+    use RefGenerator;
+
+    public function __construct() {}
 
     #[Route('/admin', name: 'admin')]
     public function index(Request $request): Response
     {
-        $person = [
-            'name' => 'John Doe',
-            'age' => 30,
-            'email' => 'email@domain.com'
-        ];
+        $seo = new Seo();
+        $seo->setRef($this->generateRef('SEO'))
+            ->setTitle('Home - Admin')
+            ->setDescription('Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolores accusamus optio rem repudiandae maxime, omnis odit? Necessitatibus asperiores, similique ipsam eum omnis odit libero quos, sequi culpa nostrum, accusantium numquam.')
+            ->addTag((new SeoTag)
+                    ->setName('robots')
+                    ->setAttribute('name')
+                    ->setContent('index, follow')
+            )
+            ->setKeywords([
+                'admin',
+                'dashboard',
+                'symfony',
+                'php',
+            ])
+        ;
 
-        $log = [
-            'level' => 'info',
-            'context' => [
-                'action' => 'Admin page accessed',
-            ],
-            'content' => [
-                'data' => $person,
-                'message' => 'Admin page accessed successfully',
-            ],
-            'origin' => $request->getSchemeAndHttpHost() . $request->getPathInfo(),
-            'timestamp' => date('Y-m-d H:i:s'),
-        ];
-
-        $logger = new Logger('admin/consultation');
-        $logger->info($log['content'], $log['context']);
-        $log = $this->jsonSerializer->denormalize($log, Log::class);
-        $log = $log->generate();
-
-        return $this->render('admin/index.html.twig', compact('log'));
+        return $this->render('admin/index.html.twig', ['seo' => $seo]);
     }
 }
