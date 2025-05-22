@@ -66,4 +66,32 @@ trait StringTrait
     {
         return wordwrap($string, $width, $break, $cut);
     }
+
+    /**
+     * Coupe une phrase à une longueur maximale spécifiée sans couper les mots.
+     *
+     * @param string $str    Le texte à couper.
+     * @param int    $length La longueur maximale de la phrase (par défaut 60 caractères).
+     * @return string          Le texte coupé, éventuellement suivi de points de suspension.
+     *
+     * @example
+     *   $str = "Ceci est une phrase très longue qui doit être coupée proprement.";
+     *   echo $this->cutText($str, 25);
+     *   // Résultat : "Ceci est une phrase très..."
+     */
+    public function cutText(string $str, int $length = 60, string $ending = '...'): string
+    {
+        if (strlen($str) <= $length) {
+            return $str; // Retourne la chaîne si elle est plus courte que la limite
+        }
+
+        $str = substr($str, 0, $length); // Coupe à la longueur souhaitée
+        $dernierEspace = strrpos($str, ' '); // Trouve le dernier espace avant la coupure
+
+        if ($dernierEspace !== false) {
+            $str = substr($str, 0, $dernierEspace); // Coupe avant le dernier mot
+        }
+
+        return $str . $ending; // Ajoute les points de suspension pour indiquer la coupure
+    }
 }

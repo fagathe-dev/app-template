@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Phplib\Token;
+namespace Fagathe\Libs\Helpers\Token;
 
 final class Token
 {
