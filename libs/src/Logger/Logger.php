@@ -4,8 +4,8 @@ namespace Fagathe\Libs\Logger;
 
 use DateTimeImmutable;
 use Fagathe\Libs\DetectDevice\DetectDevice;
-use Fagathe\Libs\Helpers\EncodeTrait;
 use Fagathe\Libs\Helpers\IPChecker;
+use Fagathe\Libs\Helpers\Token\EncodeTrait;
 use Fagathe\Libs\JSON\JsonSerializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;

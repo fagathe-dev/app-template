@@ -15,8 +15,25 @@ security:
             security: false
         main:
             lazy: true
-            stateless: false
             provider: app_user_provider
+            custom_authenticators:
+                - Fagathe\Libs\Security\Symfony\Authenticator\FormLoginAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: app_login
+        api:
+            pattern: ^/api
+            provider: app_user_provider
+            stateless: true
+            custom_authenticators:
+                - Fagathe\Libs\Security\Symfony\Authenticator\ApiAuthenticator
+            entry_point: Fagathe\Libs\Security\Symfony\ApiEntryPoint
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -24,11 +41,15 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+    
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/registration, roles: PUBLIC_ACCESS }
+        - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+        # - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

@@ -4,8 +4,8 @@ namespace Fagathe\Libs\SEO;
 
 use App\Entity\Seo;
 use App\Entity\SeoTag;
-use Fagathe\Libs\Helpers\RequestTrait;
-use Fagathe\Libs\Helpers\StringTrait;
+use Fagathe\Libs\Helpers\Request\RequestTrait;
+use Fagathe\Libs\Helpers\String\StringTrait;
 use Fagathe\Libs\SEO\Meta\SeoInterface;
 use Fagathe\Libs\SEO\Tag\MetaTag;
 use Fagathe\Libs\SEO\Tag\TitleTag;

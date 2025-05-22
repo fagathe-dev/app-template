@@ -3,7 +3,7 @@
 namespace Fagathe\Libs\SEO\Tag;
 
 use App\Entity\SeoTag;
-use Fagathe\Libs\Helpers\StringTrait;
+use Fagathe\Libs\Helpers\String\StringTrait;
 
 final class MetaTag
 {

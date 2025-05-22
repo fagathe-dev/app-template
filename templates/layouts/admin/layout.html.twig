@@ -2,11 +2,12 @@
 <html lang="fr" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 <head>
 
-  <meta charset="utf-8" />
-  <title>Velzon - Admin & Dashboard Template</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-  <meta content="Themesbrand" name="author" />
+  {% if seo is defined %}
+    {{ generate_seo(seo) }}
+  {% else %}
+    {{ generate_seo() }}
+  {% endif %}
+
   <!-- App favicon -->
   <link rel="apple-touch-icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
   <link rel="icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >

@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block body %}
-  {{ log|raw }}
+  {# {{ log|raw }} #}
+  <pre>
+    {{ dump(APP_NAME) }}
+  </pre>
 {% endblock %}
 
 {% block javascripts %}

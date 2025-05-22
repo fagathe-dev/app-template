@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Libs\Helpers;
+namespace Fagathe\Libs\Helpers\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 
