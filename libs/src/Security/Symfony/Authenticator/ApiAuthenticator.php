@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Phplib\Security\Symfony\Authenticator;
+namespace Fagathe\Libs\Security\Symfony\Authenticator;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
