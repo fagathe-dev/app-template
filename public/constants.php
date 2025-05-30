@@ -1,5 +1,7 @@
 <?php
 
+define('ROOT_DIR', dirname(__DIR__) . '/');
+
 ## LOGGER CONFIGURATION
 define('LOG_DIR', dirname(__DIR__) . '/logs/');
 define('LOG_RETENTION_DAYS', 30); // Number of days to keep logs

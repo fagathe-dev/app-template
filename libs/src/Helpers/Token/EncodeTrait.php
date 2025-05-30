@@ -10,9 +10,9 @@ trait EncodeTrait
      * @param string $string
      * @return string
      */
-    public function encodeBase64(string $string): array|string|float|bool|null
+    public function encodeBase64(string $string): string
     {
-        return json_decode(base64_encode($string), true);
+        return base64_encode(json_encode($string));
     }
     
     /**
@@ -21,8 +21,8 @@ trait EncodeTrait
      * @param string $string
      * @return string
      */
-    public function decodeBase64(string $string): string
+    public function decodeBase64(string $string): array|string|float|bool|null
     {
-        return base64_encode(json_encode($string));
+        return json_decode(base64_decode($string), true);
     }
 }

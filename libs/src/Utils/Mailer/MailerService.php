@@ -9,7 +9,6 @@ use Fagathe\Libs\Helpers\Validator;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
 use Fagathe\Libs\Utils\Mailer\RecepientEnum;
-use SebastianBergmann\Template\Template;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Mailer\MailerInterface;
@@ -21,6 +20,8 @@ final class MailerService
 {
 
     private const LOG_FILE = 'mailer/mailer';
+    private const DEFAULT_EMAIL_TEMPLATES_DIR = 'emails/';
+
     use RequestTrait;
 
     public function __construct(private MailerInterface $mailer)
@@ -79,9 +80,10 @@ final class MailerService
                 $email = $this->setRecepient($email, $bcc, RecepientEnum::Bcc);
             }
             $email->subject($subject);
-            $email->htmlTemplate($template);
-            $email->context($context);
+            $email->htmlTemplate(static::DEFAULT_EMAIL_TEMPLATES_DIR . $template . '.html.twig');
+            $email = $this->setContext($email, $context);
             $email = $this->setAttachments($email, $attachments);
+            $email->embed(fopen(ROOT_DIR . 'public/images/logo-light.png', 'r'), 'logo_cid');
 
             $this->mailer->send($email);
         } catch (Exception $e) {
@@ -152,13 +154,19 @@ final class MailerService
      */
     private function setContext(TemplatedEmail $email, array $context = []): TemplatedEmail
     {
+        $origin = $this->getOrigin();
+        $logo_path = ROOT_DIR . 'public/images/logo-light.png'; // Default logo URL
+        $type = pathinfo($logo_path, PATHINFO_EXTENSION);
+        $data = file_get_contents($logo_path);
         $presetContext = [
             'app_name' => APP_NAME,
-            'base_url' => $this->getOrigin(),
+            'base_url' => $origin,
+            'logo' => 'data:image/' . $type . ';base64,' . base64_encode($data),
         ];
 
         $context = array_merge($presetContext, $context);
         $email->context($context);
+
         return $email;
     }
 
@@ -182,8 +190,8 @@ final class MailerService
         }
 
         if (is_array($sender)) {
-            $key = array_keys($sender[0])[0];
-            $value = array_values($sender[0])[0];
+            $key = array_keys($sender)[0];
+            $value = array_values($sender)[0];
 
             if (Validator::isValidEmail($key)) {
                 $sender = new Address($key, $value);
@@ -192,7 +200,7 @@ final class MailerService
             }
         }
 
-        if (!is_string($sender) && !is_array($sender)) {
+        if (!is_string($sender) && !is_array($sender) && !$sender instanceof Address) {
             $this->generateLog(
                 content: ['exception' => 'Invalid sender format. Expected array or string.'],
                 context: ['action' => __METHOD__],

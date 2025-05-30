@@ -10,8 +10,12 @@
                 <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                   <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                     <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
-                      <div style="margin-bottom: 15px;">
-                        <img src="cid:logo" style="margin: 0 auto;" alt="Logo FileTransfer" height="40">
+                      <div style="margin-bottom: 15px; text-align: center;">
+                        {% if app.request.pathInfo starts with '/admin/email' %}
+                          <img src="{{ base_url ~ '/images/logo-light.webp' }}" style="margin: 0 auto;" alt="Logo fagathe-dev" height="40">
+                        {% else %}
+                          <img src="cid:logo_cid" style="margin: 0 auto;" alt="Logo fagathe-dev" height="40">
+                        {% endif %}
                       </div>
                     </td>
                   </tr>
@@ -33,7 +37,7 @@
               </li>
             </ul> #}
             <p style="font-family: 'Roboto', sans-serif; font-size: 14px;color: #98a6ad; margin: 0px;">
-              {{ 'now'|date('Y') }} FileTransfer concu & developpé par <a href="https://fagathe-dev.me">fagathe-dev</a>
+              {{ 'now'|date('Y') }} {{ app_name }} coçu & developpé par <a href="https://fagathe-dev.fr">fagathe-dev</a>
             </p>
           </div>
         </div>

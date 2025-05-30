@@ -1,0 +1,10 @@
+{% extends "layouts/admin/layout.html.twig" %}
+
+{% block body %}
+  <h1 class="h3 mb-5">Liste des e-mails</h1>
+  
+  {% for email in emails %}
+    <h2 class="h4">{{ email.action }}</h2>
+    {% include email.template with email.context %}
+  {% endfor %}
+{% endblock %}
