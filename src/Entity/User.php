@@ -6,11 +6,24 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`user`', indexes: [new ORM\Index(name: 'user_ids', columns: ['username', 'firstname', 'identifier', 'lastname', 'email', ], flags: ['fulltext'])])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[UniqueEntity(
+    fields: ['email'],
+    errorPath: 'email',
+    message: 'Cette adresse email est déjà utilisée !'
+), UniqueEntity(
+    fields: ['username'],
+    errorPath: 'username',
+    message: 'Ce nom d\'utilisateur est déjà utilisé !'
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -19,6 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message: 'L’email est requis.')]
+    #[Assert\Email(message: 'L’email "{{ value }}" n’est pas valide.')]
     private ?string $email = null;
 
     /**
@@ -54,6 +69,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[Assert\NotBlank(message: 'Le nom d’utilisateur est requis.')]
+    #[Assert\Length(min: 3, max: 100, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
     #[ORM\Column(length: 100)]
     private ?string $username = null;
 

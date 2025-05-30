@@ -320,8 +320,7 @@ final class MailerService
 
         return $email;
     }
-
-
+    
     /**
      * @param array $content
      * @param array $context
