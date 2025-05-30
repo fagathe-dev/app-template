@@ -12,6 +12,7 @@
 /logs/
 /public/secret.php
 /vendor/
+/migrations/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

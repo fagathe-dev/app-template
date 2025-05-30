@@ -69,42 +69,7 @@
                     {% endblock %}
                   </div>
                   <div class="p-2 mt-4">
-                    <div class="alert alert-danger alert-dismissible shadow fade show" role="alert">
-                      <strong> Hi! </strong> A simple <b>Dismissible primary Alert </b> — check it out!
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    <form action="/">
-
-                      <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username">
-                      </div>
-
-                      <div class="mb-3">
-                        <div class="float-end">
-                          <a href="auth-pass-reset-basic" class="text-muted">Forgot password?</a>
-                        </div>
-                        <label class="form-label" for="password-input">Password</label>
-                        <div class="position-relative auth-pass-inputgroup mb-3">
-                          <input type="password" class="form-control pe-5 password-input" placeholder="Enter password" id="password-input">
-                          <button 
-                            class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted shadow-none password-addon" 
-                            type="button" 
-                            id="password-addon"
-                          ><i class="ri-eye-fill align-middle"></i></button>
-                        </div>
-                      </div>
-
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
-                        <label class="form-check-label" for="auth-remember-check">Remember me</label>
-                      </div>
-
-                      <div class="mt-4">
-                        <button class="btn btn-success w-100" type="submit">Sign In</button>
-                      </div>
-
-                    </form>
+                    {% block content %}{% endblock %}
                   </div>
                 </div>
                 <!-- end card body -->
@@ -125,7 +90,7 @@
     </div>
     <!-- end auth page content -->
 
-    {% include 'layouts/auth/footer.html.twig'}
+    {% include 'layouts/auth/footer.html.twig' %}
 
   </div>
   <!-- end auth-page-wrapper -->
