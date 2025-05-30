@@ -1,0 +1,32 @@
+{% extends "emails/base.html.twig" %}
+
+{% block content %}
+  <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+    <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 24px; vertical-align: top; margin: 0; padding: 0 0 10px;  text-align: center;" valign="top">
+      <h4 style="font-family: 'Roboto', sans-serif; font-weight: 500;">👋 {{ user.name ?? user.username }}</h5>
+    </td>
+  </tr>
+  <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+    <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 24px; vertical-align: top; margin: 0; padding: 0 0 10px;  text-align: center;" valign="top">
+      <h4 style="font-family: 'Roboto', sans-serif; font-weight: 500;">Merci de vous être inscrit sur notre application 🙏</h5>
+    </td>
+  </tr>
+  <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+    <td class="content-block" style="font-family: 'Roboto', sans-serif; color: #878a99; box-sizing: border-box; font-size: 15px; vertical-align: top; margin: 0; padding: 0 0 26px; text-align: center;" valign="top">
+      Oui, nous savons..
+      <p style="margin-bottom: 8px;">Un email pour vérifier</p>
+      <p style="margin-bottom: 0;">Veuillez valider votre adresse email afin de commencer à utiliser notre produit.</p>
+    </td>
+  </tr>
+  <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+    <td class="content-block" itemprop="handler" itemscope itemtype="http://schema.org/HttpActionHandler" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 22px; text-align: center;" valign="top">
+      <a href="{{ activation_link }}" itemprop="url" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: .8125rem; color: #FFF; text-decoration: none; font-weight: 400; text-align: center; cursor: pointer; display: inline-block; border-radius: .25rem; text-transform: capitalize; background-color: #4b38b3; margin: 0; border-color: #4b38b3; border-style: solid; border-width: 1px; padding: .5rem .9rem;box-shadow: 0 3px 3px rgba(56,65,74,0.1);">Vérifiez votre email</a>
+    </td>
+  </tr>
+  <tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+    <td class="content-block" style="color: #878a99; text-align: center;font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0; padding-top: 5px" valign="top">
+      <p style="margin-bottom: 10px;">Ou vérifiez en utilisant ce lien </p>
+      <a href="{{ activation_link }}" target="_blank">{{ activation_link }}</a>
+    </td>
+  </tr>
+{% endblock %}

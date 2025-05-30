@@ -9,6 +9,7 @@ twig:
         APP_GITHUB_URL: '%env(APP_GITHUB_URL)%'
         APP_PHONE_NUMBER: '%env(APP_PHONE_NUMBER)%'
         APP_EMAIL_CONTACT: '%env(APP_EMAIL_CONTACT)%'
+        APP_MAPS_API_KEY: '%env(APP_MAPS_API_KEY)%'
 
 when@test:
     twig:

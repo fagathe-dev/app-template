@@ -173,11 +173,11 @@ final class Logger
         if ($emailSession !== null) {
             $context['uid'] = $emailSession;
         }
-
+        
         if (isset($_COOKIE[static::LOG_CONTEXT])) {
-
+            
             $context = $this->decodeBase64($_COOKIE[static::LOG_CONTEXT]);
-
+            
             if (isset($context['uid']) && $context['uid'] !== 'anonymous' && $emailSession !== null) {
                 $boolRenewContext = true;
             }

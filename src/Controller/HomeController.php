@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Fagathe\Libs\Utils\Mailer\MailerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -14,9 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
 
-    public function __construct(private MailerInterface $mailer)
-    {
-    }
+    public function __construct(private MailerService $mailer) {}
 
     #[Route('/', name: 'home')]
     public function index(): Response
@@ -33,7 +32,19 @@ class HomeController extends AbstractController
             ->addPart(new DataPart(new File($file), $file_name, $file_mime_type)) // Ensure the logo is attached correctly
         ;
 
-        $this->mailer->send($email);
+        $this->mailer->sendEmail(
+            ['Frédérick AGATHE' => 'fagathe77@gmail.com'],
+            'Vérification de compte',
+            'auth/verify-account',
+            [
+                'user' => [
+                    'name' => 'Frédérick',
+                    'email' => 'fagathe77@gmail.com',
+                    'username' => 'fagathe77',
+                ],
+                'activation_link' => 'https://example.com/activate?token=123456',
+            ]
+        );
         return $this->render('landing/index.html.twig');
     }
 }
