@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\User;
+use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -21,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CreateAdminUserCommand extends Command {
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private UserService $service,
         private UserPasswordHasherInterface $hasher
     ) {
         parent::__construct();
@@ -65,10 +66,9 @@ class CreateAdminUserCommand extends Command {
             ->setUsername($username)
             ->setConfirm(true)
             ->setPassword($password)
-            ->setRegisteredAt(new DateTimeImmutable('now'))
         ;
 
-        $this->entityManager->persist($user);
+        $this->service->create($user);
         $io->success('A new admin user has been created ! 🚀');
 
         return Command::SUCCESS;
