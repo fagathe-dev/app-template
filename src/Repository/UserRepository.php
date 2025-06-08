@@ -49,6 +49,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         foreach ($result as $key => $value) {
             $value['roles'] = json_decode($value['roles'], true);
             $value['confirm'] = (bool) $value['confirm'];
+            $value['active'] = (bool) $value['active'];
             $users[$key] = $this->denormalizer->denormalize($value, User::class);
         }
 

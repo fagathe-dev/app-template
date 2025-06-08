@@ -1,15 +1,19 @@
 <?php
+
 namespace App\Service;
 
 use Fagathe\Libs\Utils\Mailer\Email;
 
-final class EmailService {
+final class EmailService
+{
 
-    public function __construct() {
+    public function __construct() {}
 
-    }
-
-    public function index(): array {
+    /**
+     * @return array
+     */
+    public function index(): array
+    {
         $emails = [
             new Email(
                 name: 'AUTH_VERIFY_ACCOUNT',
