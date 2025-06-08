@@ -19,7 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'app:create-admin-user',
     description: 'Create an admin user',
 )]
-class CreateAdminUserCommand extends Command {
+class CreateAdminUserCommand extends Command
+{
 
     public function __construct(
         private UserService $service,
@@ -28,7 +29,8 @@ class CreateAdminUserCommand extends Command {
         parent::__construct();
     }
 
-    protected function configure(): void {
+    protected function configure(): void
+    {
         $this
             ->addArgument('username', InputArgument::OPTIONAL, 'Admin username')
             ->addArgument('email', InputArgument::OPTIONAL, 'Admin email')
@@ -36,24 +38,25 @@ class CreateAdminUserCommand extends Command {
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $helper = $this->getHelper('question');
         $io = new SymfonyStyle($input, $output);
 
         $username = $input->getArgument('username');
-        if(!$username) {
+        if (!$username) {
             $question = new Question('Nom d\'utilisateur : ');
             $username = $helper->ask($input, $output, $question);
         }
 
         $email = $input->getArgument('email');
-        if(!$email) {
+        if (!$email) {
             $question = new Question('Adresse e-mail : ');
             $email = $helper->ask($input, $output, $question);
         }
 
         $password = $input->getArgument('password');
-        if(!$password) {
+        if (!$password) {
             $question = new Question('Mot de passe : ');
             $question->setHidden(true);
             $question->setHiddenFallback(false);
@@ -64,8 +67,9 @@ class CreateAdminUserCommand extends Command {
             ->setEmail($email)
             ->setRoles(['ROLE_ADMIN'])
             ->setUsername($username)
-            ->setConfirm(true)
+            ->setActive(true)
             ->setPassword($password)
+            ->setActive(true)
         ;
 
         $this->service->create($user);

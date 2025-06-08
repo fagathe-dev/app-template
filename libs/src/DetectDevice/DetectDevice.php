@@ -17,7 +17,9 @@ final class DetectDevice
     {
         $this->detect = new MobileDetect();
         $this->request = Request::createFromGlobals();
-        $this->detect->setUserAgent($this->request->headers->get('User-Agent'));
+        if ($this->request->headers->has('User-Agent')) {
+            $this->detect->setUserAgent($this->request->headers->get('User-Agent'));
+        }
     }
 
     /**

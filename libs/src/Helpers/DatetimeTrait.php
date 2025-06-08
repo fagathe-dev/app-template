@@ -77,6 +77,6 @@ trait DateTimeTrait
      */
     public function isDatePast(DateTimeImmutable $date): bool
     {
-        return $this->now() < $date;
+        return $this->now() > $date;
     }
 }

@@ -70,6 +70,13 @@ final class MailerService
     ): void {
 
         try {
+
+            if (str_starts_with(static::DEFAULT_EMAIL_TEMPLATES_DIR, $template)) {
+                $template = str_replace(static::DEFAULT_EMAIL_TEMPLATES_DIR, '', $template);
+            }
+            if (str_ends_with('.html.twig', $template)) {
+                $template = str_replace('.html.twig', '', $template);
+            }
             $email = (new TemplatedEmail);
             $email->from($this->getSender($sender));
             $email = $this->setRecepient($email, $recepient);
@@ -80,7 +87,7 @@ final class MailerService
                 $email = $this->setRecepient($email, $bcc, RecepientEnum::Bcc);
             }
             $email->subject($subject);
-            $email->htmlTemplate(static::DEFAULT_EMAIL_TEMPLATES_DIR . $template . '.html.twig');
+            $email->htmlTemplate($template);
             $email = $this->setContext($email, $context);
             $email = $this->setAttachments($email, $attachments);
             $email->embed(fopen(ROOT_DIR . 'public/images/logo-light.png', 'r'), 'logo_cid');
@@ -222,7 +229,7 @@ final class MailerService
      *
      * @example
      * $email = new TemplatedEmail();
-     * $recepient = ['email' => 'john.doe@example.com', 'name' => 'John Doe'];
+     * $recepient = ['John Doe' => 'john.doe@example.com'];
      * $updatedEmail = $this->setRecepient($email, $recepient, RecepientEnum::Cc);
      */
     private function setRecepient(TemplatedEmail $email, array $recepient, RecepientEnum $type = RecepientEnum::To): TemplatedEmail
@@ -242,6 +249,7 @@ final class MailerService
             $eMail = [];
 
             if (is_int($key)) {
+                dd($key, $value);
                 if (Validator::isValidEmail($value)) {
                     $eMail = ['address' => $value];
                 } else {
@@ -320,7 +328,7 @@ final class MailerService
 
         return $email;
     }
-    
+
     /**
      * @param array $content
      * @param array $context

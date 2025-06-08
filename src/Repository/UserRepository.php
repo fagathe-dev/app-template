@@ -49,10 +49,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         foreach ($result as $key => $value) {
             $value['roles'] = json_decode($value['roles'], true);
             $value['confirm'] = (bool) $value['confirm'];
+            $value['active'] = (bool) $value['active'];
             $users[$key] = $this->denormalizer->denormalize($value, User::class);
         }
 
         return $users;
+    }
+
+    /**
+     * @return User[] Returns an array of User objects
+     */
+    public function findByUsernameOrEmail(string $userIdentifier): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username = :uuid')
+            ->orWhere('u.email = :uuid')
+            ->setParameter('uuid', $userIdentifier)
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 
     //    public function findOneBySomeField($value): ?User

@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Service;
 
+use App\Entity\UserRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -8,8 +10,12 @@ use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use Fagathe\Libs\Helpers\DateTimeTrait;
 use Fagathe\Libs\Helpers\Request\ResponseTrait;
+use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
+use Fagathe\Libs\Utils\Mailer\Email;
+use Fagathe\Libs\Utils\Mailer\MailerService;
+use Fagathe\Libs\Utils\UserRequestEnum;
 use Fagathe\Phplib\Service\Breadcrumb\Breadcrumb;
 use Fagathe\Phplib\Service\Breadcrumb\BreadcrumbItem;
 use Knp\Component\Pager\Pagination\PaginationInterface;
@@ -18,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class UserService
 {
@@ -31,11 +38,11 @@ final class UserService
         private UserRepository $repository,
         private PaginatorInterface $paginator,
         private UserPasswordHasherInterface $hasher,
-        private LoggerInterface $logger,
         private EntityManagerInterface $manager,
+        private MailerService $mailer,
+        private UrlGeneratorInterface $urlGenerator,
         private Security $security
-    ) {
-    }
+    ) {}
 
     /**
      * update
@@ -79,8 +86,7 @@ final class UserService
     public function create(User $user): bool
     {
         $user->setRegisteredAt($this->now())
-            ->setIdentifier($user->getEmail())
-            ->setConfirm(true);
+            ->setIdentifier($user->getEmail());
         $this->hash($user);
 
         $result = $this->save($user);
@@ -105,9 +111,13 @@ final class UserService
         try {
             $this->manager->persist($user);
             $this->manager->flush();
+            $this->generateLog(
+                content: ['message' => sprintf('Enregistrement des données de l\'utilisateur %s réussi.', $user->getUsername())],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
             return true;
         } catch (ORMException $e) {
-            $this->logger->error($e->getMessage());
             $this->addFlash('danger', $e->getMessage());
             $this->generateLog(
                 content: ['exception' => 'Une erreur est survenue lors de l\'enregistrement des données :' . $e->getMessage()],
@@ -122,7 +132,6 @@ final class UserService
                 context: ['action' => __METHOD__],
                 level: LoggerLevelEnum::Error
             );
-            $this->logger->error($e->getMessage());
             return false;
         }
     }
@@ -138,7 +147,11 @@ final class UserService
         try {
             $this->manager->remove($user);
             $this->manager->flush();
-            $this->logger->info('User {username} is removed form db', ['username' => $user->getUsername()]);
+            $this->generateLog(
+                content: ['message' => sprintf('L\'utilisateur %s a été supprimé avec succès.', $user->getUsername())],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
             return $this->sendNoContent();
         } catch (ORMException $e) {
             $this->generateLog(
@@ -157,6 +170,12 @@ final class UserService
         }
     }
 
+    /**
+     * @param string $plainPassword
+     * @param User $user
+     * 
+     * @return bool
+     */
     public function updatePassword(string $plainPassword, User $user): bool
     {
         $user->setPassword(
@@ -216,12 +235,11 @@ final class UserService
 
         if ($user instanceof User) {
             return $user;
-            
         }
         return null;
     }
 
-    
+
     /**
      * @param array $content
      * @param array $context
@@ -234,5 +252,4 @@ final class UserService
         $logger = new Logger(self::LOG_FILE);
         $logger->log($level, $content, $context);
     }
-
 }
