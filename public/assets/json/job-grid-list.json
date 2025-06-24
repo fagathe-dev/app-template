@@ -1,7 +1,7 @@
 [
 	{
         "id": 1,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "jobTitle": "Education Training",
         "companyName": "Micro Design",
         "location": "Escondido,California",
@@ -11,7 +11,7 @@
         "status": "Active"
     },{
         "id": 2,
-        "companyLogo": "assets/images/companies/img-2.png",
+        "companyLogo": "/assets/images/companies/img-2.png",
         "jobTitle": "Magento Developer",
         "companyName": "Themesbrand",
         "location": "Stordorf, Germany",
@@ -21,7 +21,7 @@
         "status": "New"
     },{
         "id": 3,
-        "companyLogo": "assets/images/companies/img-3.png",
+        "companyLogo": "/assets/images/companies/img-3.png",
         "jobTitle": "Product Designer",
         "companyName": "Themesbrand",
         "location": "Cullera, Spain",
@@ -31,7 +31,7 @@
         "status": "Active"
     },{
         "id": 4,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "jobTitle": "React Developer",
         "companyName": "iTest Factory",
         "location": "Haren, Germany",
@@ -41,7 +41,7 @@
         "status": "New"
     },{
         "id": 5,
-        "companyLogo": "assets/images/companies/img-6.png",
+        "companyLogo": "/assets/images/companies/img-6.png",
         "jobTitle": "UI/UX Designer",
         "companyName": "Creative Team",
         "location": "Vinninga, Sweden",
@@ -51,7 +51,7 @@
         "status": "Active"
     },{
         "id": 6,
-        "companyLogo": "assets/images/companies/img-7.png",
+        "companyLogo": "/assets/images/companies/img-7.png",
         "jobTitle": "Marketing Director",
         "companyName": "Themesbrand",
         "location": "Zhoukou, China",
@@ -61,7 +61,7 @@
         "status": "Close"
     },{
         "id": 7,
-        "companyLogo": "assets/images/companies/img-8.png",
+        "companyLogo": "/assets/images/companies/img-8.png",
         "jobTitle": "Full Stack Engineer",
         "companyName": "Syntyce Solutions",
         "location": "Boroaia, Romania",
@@ -71,7 +71,7 @@
         "status": "Active"
     },{
         "id": 8,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "jobTitle": "Project Manager",
         "companyName": "Themesbrand",
         "location": "Pazmand, Hungary",
@@ -81,7 +81,7 @@
         "status": "New"
     },{
         "id": 9,
-        "companyLogo": "assets/images/companies/img-2.png",
+        "companyLogo": "/assets/images/companies/img-2.png",
         "jobTitle": "HTML Developer",
         "companyName": "Themesbrand",
         "location": "Donsieders, Germany",
@@ -91,7 +91,7 @@
         "status": "Active"
     },{
         "id": 10,
-        "companyLogo": "assets/images/companies/img-3.png",
+        "companyLogo": "/assets/images/companies/img-3.png",
         "jobTitle": "Business Associate",
         "companyName": "Themesbrand",
         "location": "Sermerieu, France",
@@ -101,7 +101,7 @@
         "status": "Active"
     },{
         "id": 11,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "jobTitle": "Assistant / Store Keeper",
         "companyName": "Force Medicines",
         "location": "San Lorenzo, Philippines",
@@ -111,7 +111,7 @@
         "status": "Active"
     },{
         "id": 12,
-        "companyLogo": "assets/images/companies/img-6.png",
+        "companyLogo": "/assets/images/companies/img-6.png",
         "jobTitle": "Product Sales Specialist",
         "companyName": "Themesbrand",
         "location": "Pazmand, Hungary",

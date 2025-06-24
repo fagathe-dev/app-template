@@ -1,7 +1,7 @@
 [   
     {
         "id": 1,
-        "companyLogo": "assets/images/companies/img-3.png",
+        "companyLogo": "/assets/images/companies/img-3.png",
         "companyName": "Martin's Solutions",
         "industryType": "IT Department",
         "vacancy": "97",
@@ -14,7 +14,7 @@
         "since": "1995"
     },{
         "id": 2,
-        "companyLogo": "assets/images/companies/img-4.png",
+        "companyLogo": "/assets/images/companies/img-4.png",
         "companyName": "Syntyce Solutions",
         "industryType": "Health Services",
         "vacancy": "31",
@@ -27,7 +27,7 @@
         "since": "2001"
     },{
         "id": 3,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "companyName": "Moetic Fashion",
         "industryType": "Textiles: Clothing, Footwear",
         "vacancy": "641",
@@ -40,7 +40,7 @@
         "since": "2000"
     },{
         "id": 4,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "companyName": "Meta4Systems",
         "industryType": "Computer Industry",
         "vacancy": "322",
@@ -53,7 +53,7 @@
         "since": "2019"
     },{
         "id": 5,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "companyName": "Kent's",
         "industryType": "IT Department",
         "vacancy": "10",
@@ -66,7 +66,7 @@
         "since": "2018"
     },{
         "id": 6,
-        "companyLogo": "assets/images/companies/img-7.png",
+        "companyLogo": "/assets/images/companies/img-7.png",
         "companyName": "Micro Design",
         "industryType": "Financial Services",
         "vacancy": "140",
@@ -79,7 +79,7 @@
         "since": "2016"
     },{
         "id": 7,
-        "companyLogo": "assets/images/companies/img-6.png",
+        "companyLogo": "/assets/images/companies/img-6.png",
         "companyName": "Zoetic Fashion",
         "industryType": "Textiles: Clothing, Footwear",
         "vacancy": "21",
@@ -92,7 +92,7 @@
         "since": "2018"
     },{
         "id": 8,
-        "companyLogo": "assets/images/companies/img-8.png",
+        "companyLogo": "/assets/images/companies/img-8.png",
         "companyName": "Digitech Galaxy",
         "industryType": "Telecommunications Services",
         "vacancy": "154",
@@ -105,7 +105,7 @@
         "since": "2014"
     },{
         "id": 9,
-        "companyLogo": "assets/images/companies/img-9.png",
+        "companyLogo": "/assets/images/companies/img-9.png",
         "companyName": "Erlebacher's",
         "industryType": "Health Services",
         "vacancy": "134",
@@ -118,7 +118,7 @@
         "since": "2016"
     },{
         "id": 10,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "companyName": "iTest Factory",
         "industryType": "Chemical Industries",
         "vacancy": "126",
@@ -131,7 +131,7 @@
         "since": "2016"
     },{
         "id": 11,
-        "companyLogo": "assets/images/companies/img-7.png",
+        "companyLogo": "/assets/images/companies/img-7.png",
         "companyName": "Zoetic Fashion",
         "industryType": "Textiles: Clothing, Footwear",
         "vacancy": "47",
@@ -144,7 +144,7 @@
         "since": "2015"
     },{
         "id": 12,
-        "companyLogo": "assets/images/companies/img-3.png",
+        "companyLogo": "/assets/images/companies/img-3.png",
         "companyName": "Micro Design",
         "industryType": "IT Department",
         "vacancy": "23",
@@ -157,7 +157,7 @@
         "since": "2014"
     },{
         "id": 13,
-        "companyLogo": "assets/images/companies/img-4.png",
+        "companyLogo": "/assets/images/companies/img-4.png",
         "companyName": "Syntyce Solutions",
         "industryType": "Computer Industry",
         "vacancy": "11",
@@ -170,7 +170,7 @@
         "since": "2016"
     },{
         "id": 14,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "companyName": "Asiatic Solutions",
         "industryType": "Health Services",
         "vacancy": "9",
@@ -183,7 +183,7 @@
         "since": "2019"
     },{
         "id": 15,
-        "companyLogo": "assets/images/companies/img-1.png",
+        "companyLogo": "/assets/images/companies/img-1.png",
         "companyName": "Great Clothes",
         "industryType": "Textiles: Clothing, Footwear",
         "vacancy": "60",
@@ -196,7 +196,7 @@
         "since": "2017"
     },{
         "id": 16,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "companyName": "Kent's Solutions",
         "industryType": "IT Department",
         "vacancy": "26",
@@ -209,7 +209,7 @@
         "since": "2018"
     },{
         "id": 17,
-        "companyLogo": "assets/images/companies/img-4.png",
+        "companyLogo": "/assets/images/companies/img-4.png",
         "companyName": "Syntyce Solutions",
         "industryType": "Computer Industry",
         "vacancy": "11",
@@ -222,7 +222,7 @@
         "since": "2016"
     },{
         "id": 18,
-        "companyLogo": "assets/images/companies/img-4.png",
+        "companyLogo": "/assets/images/companies/img-4.png",
         "companyName": "Syntyce Solutions",
         "industryType": "Health Services",
         "vacancy": "31",
@@ -235,7 +235,7 @@
         "since": "2001"
     },{
         "id": 19,
-        "companyLogo": "assets/images/companies/img-5.png",
+        "companyLogo": "/assets/images/companies/img-5.png",
         "companyName": "iTest Factory",
         "industryType": "Chemical Industries",
         "vacancy": "126",
@@ -248,7 +248,7 @@
         "since": "2016"
     },{
         "id": 20,
-        "companyLogo": "assets/images/companies/img-6.png",
+        "companyLogo": "/assets/images/companies/img-6.png",
         "companyName": "Zoetic Fashion",
         "industryType": "Textiles: Clothing, Footwear",
         "vacancy": "21",

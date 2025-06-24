@@ -7,8 +7,8 @@ File: Chat init js
 */
 
 (function () {
-    var dummyUserImage = "assets/images/users/user-dummy-img.jpg";
-    var dummyMultiUserImage = "assets/images/users/multi-user.jpg";
+    var dummyUserImage = "/assets/images/users/user-dummy-img.jpg";
+    var dummyMultiUserImage = "/assets/images/users/multi-user.jpg";
     var isreplyMessage = false;
 
     // favourite btn
@@ -48,7 +48,7 @@ File: Chat init js
     //User current Id
     var currentChatId = "users-chat";
     var currentSelectedChat = "users";
-    var url="assets/json/";
+    var url="/assets/json/";
     var usersList = "";
     var userChatId = 1;
 
@@ -922,7 +922,7 @@ File: Chat init js
         closeButton: true,
         position: ["top", "right"],
         preFetch: true,
-        dir: "assets/js/pages/plugins/json",
+        dir: "/assets/js/pages/plugins/json",
         insertInto: document.querySelector(".chat-input"),
     });
 

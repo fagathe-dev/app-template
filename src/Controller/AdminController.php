@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Seo;
 use App\Entity\SeoTag;
+use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
+use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
 use Fagathe\Libs\Helpers\String\RefGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +39,9 @@ class AdminController extends AbstractController
             ])
         ;
 
-        return $this->render('admin/index.html.twig', ['seo' => $seo]);
+        $breadcrumb = new Breadcrumb(
+        );
+
+        return $this->render('admin/index.html.twig', compact('seo', 'breadcrumb'));
     }
 }

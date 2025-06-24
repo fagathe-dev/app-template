@@ -3,7 +3,7 @@
       "target": "ES6",
       "module": "commonjs",
       "strictNullChecks": true,
-      "noImplicitAny": true,
+      "noImplicitAny": false,
       "strictFunctionTypes": false,
       "strictPropertyInitialization": true,
       "jsx": "react",
