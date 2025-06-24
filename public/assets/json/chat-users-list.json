@@ -5,13 +5,13 @@
         "id": 1,
         "name": "Lisa Parker",
         "status": "online",
-        "profile": "assets/images/users/avatar-2.jpg"
+        "profile": "/assets/images/users/avatar-2.jpg"
       },
       {
         "id": 2,
         "name": "Frank Thomas",
         "status": "online",
-        "profile": "assets/images/users/avatar-3.jpg",
+        "profile": "/assets/images/users/avatar-3.jpg",
         "messagecount" : 8
       },
       {
@@ -25,20 +25,20 @@
         "id": 4,
         "name": "Janette Caster",
         "status": "online",
-        "profile": "assets/images/users/avatar-4.jpg"
+        "profile": "/assets/images/users/avatar-4.jpg"
       },
       {
         "id": 5,
         "name": "Sarah Beattie",
         "status": "online",
-        "profile": "assets/images/users/avatar-5.jpg",
+        "profile": "/assets/images/users/avatar-5.jpg",
         "messagecount" : 5
       },
       {
         "id": 6,
         "name": "Nellie Cornett",
         "status": "away",
-        "profile": "assets/images/users/avatar-6.jpg",
+        "profile": "/assets/images/users/avatar-6.jpg",
         "messagecount" : 2
       },
       {
@@ -59,7 +59,7 @@
         "id": 9,
         "name": "Joseph Siegel",
         "status": "away",
-        "profile": "assets/images/users/avatar-7.jpg"
+        "profile": "/assets/images/users/avatar-7.jpg"
       }
     ],
     "channels": [

@@ -24,6 +24,10 @@
   <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
   {% block stylesheets %}{% endblock %}
 
+  {% if is_markdown is defined and is_markdown == true %}
+    <link rel="stylesheet" href="{{ asset('assets/libs/prismjs/themes/prism.min.css') }}">
+  {% endif %}
+
 </head>
 
 <body>
@@ -59,7 +63,13 @@
   <!-- END layout-wrapper -->
 
   {{ include('layouts/partials/vendor-scripts.html.twig') }}
-  
+  <script src="{{ asset('js/main.js') }}"></script>
+
+  {% block scripts %}{% endblock %}
+  {% if is_markdown is defined and is_markdown == true %}
+    <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/prismjs.init.js') }}"></script>
+  {% endif %}
   {% block javascripts %}{% endblock %}
 </body>
 

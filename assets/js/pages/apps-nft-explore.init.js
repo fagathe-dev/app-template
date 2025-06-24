@@ -7,7 +7,7 @@ File: apps-nft-explore init js
 */
 
 
-var url="assets/json/";
+var url="/assets/json/";
 var allproductlist = '';
 
 //mail list by json
