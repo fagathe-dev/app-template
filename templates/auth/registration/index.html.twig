@@ -1,0 +1,16 @@
+{% extends "layouts/auth/layout.html.twig" %}
+
+{% block header %}
+  <h5 class="text-primary">{{ title is defined ? title : 'Espace d\'authentification' }}</h5>
+  <p class="text-muted">Inscription</p>
+{% endblock %}
+
+{% block footer %}
+  <div class="mt-4 text-center">
+    <p class="mb-0">J'ai déjà un compte ? <a href="auth-signup-basic" class="fw-semibold text-primary text-decoration-underline"> Connexion </a> </p> {# TODO : ajouter le lien de connexion #}
+  </div>
+{% endblock %}
+
+{% block content %}
+  {{ form(form) }}
+{% endblock %}

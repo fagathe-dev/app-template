@@ -123,7 +123,7 @@ xhttp.onload = function () {
     });
     leadsList.remove("id", `<a href="javascript:void(0);" class="fw-medium link-primary">#VZ2101</a>`);
 }
-xhttp.open("GET", "assets/json/leads-list.json");
+xhttp.open("GET", "/assets/json/leads-list.json");
 xhttp.send();
 
 // customer image
@@ -380,7 +380,7 @@ function refreshCallbacks() {
 }
 
 function clearFields() {
-    leadImg.src = "assets/images/users/user-dummy-img.jpg";
+    leadImg.src = "/assets/images/users/user-dummy-img.jpg";
     leadNameField.value = "";
     company_nameField.value = "";
     dateField.value = "";

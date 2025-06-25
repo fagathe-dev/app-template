@@ -11,20 +11,20 @@
   <link rel="icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
   
   <!-- Layout config Js -->
-  <script src="assets/js/layout.js"></script>
+  <script src="{{ asset('assets/js/layout.js') }}"></script>
   <!-- Bootstrap Css -->
-  <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- Icons Css -->
-  <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- App Css-->
-  <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- custom Css-->
-  <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- Style Css-->
-  <link href="css/style.css" rel="stylesheet" type="text/css" />
+  <link href="css/style.css') }}" rel="stylesheet" type="text/css" />
 
   <!--Swiper slider css-->
-  <link href="assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
   {% block stylesheets %}{% endblock %}
 
 </head>
@@ -37,14 +37,14 @@
     {% if banner is defined %}
       <section class="hero-section">
         <div class="profile-wid-bg profile-setting-img">
-          <img src="assets/images/profile-bg.jpg" srcset="assets/images/profile-bg.jpg" class="profile-wid-img" alt="Background Cover Image">
+          <img src="{{ asset('assets/images/profile-bg.jpg') }}" srcset="{{ asset('assets/images/profile-bg.jpg') }}" class="profile-wid-img" alt="Background Cover Image">
           <div class="overlay-content">
             <div class="container">
               <div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">
                 <div class="row g-4">
                   <div class="col-auto">
                     <div class="avatar-lg">
-                      <img src="assets/images/users/avatar-1.jpg" alt="user-img" class="img-thumbnail rounded-circle">
+                      <img src="{{ asset('assets/images/users/avatar-1.jpg') }}" alt="user-img" class="img-thumbnail rounded-circle">
                     </div>
                   </div>
                   <!--end col-->
@@ -131,7 +131,7 @@
   {{ include('layouts/partials/vendor-scripts.html.twig') }}
 
   <!--Swiper slider js-->
-  <script src="assets/libs/swiper/swiper-bundle.min.js"></script>
+  <script src="{{ asset('assets/libs/swiper/swiper-bundle.min.js') }}"></script>
 
   {% block javascripts %}
     

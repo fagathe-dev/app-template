@@ -2,7 +2,7 @@
     {
         "id": 1,
         "shop": [{
-            "img": "assets/images/companies/img-8.png",
+            "img": "/assets/images/companies/img-8.png",
             "img_alt": "img-8.png",
             "name": "Zoetic Fashion"
         }],
@@ -17,7 +17,7 @@
     },{
         "id": 2,
         "shop": [{
-            "img": "assets/images/companies/img-7.png",
+            "img": "/assets/images/companies/img-7.png",
             "img_alt": "img-7.png",
             "name": "Syntyce Solutions"
         }],
@@ -32,7 +32,7 @@
     },{
         "id": 3,
         "shop": [{
-            "img": "assets/images/companies/img-6.png",
+            "img": "/assets/images/companies/img-6.png",
             "img_alt": "img-6.png",
             "name": "Digitech Galaxy"
         }],
@@ -47,7 +47,7 @@
     },{
         "id": 4,
         "shop": [{
-            "img": "assets/images/companies/img-5.png",
+            "img": "/assets/images/companies/img-5.png",
             "img_alt": "img-5.png",
             "name": "Meta4Systems"
         }],
@@ -62,7 +62,7 @@
     },{
         "id": 5,
         "shop": [{
-            "img": "assets/images/companies/img-4.png",
+            "img": "/assets/images/companies/img-4.png",
             "img_alt": "img-4.png",
             "name": "iTest Factory"
         }],
@@ -77,7 +77,7 @@
     },{
         "id": 6,
         "shop": [{
-            "img": "assets/images/companies/img-3.png",
+            "img": "/assets/images/companies/img-3.png",
             "img_alt": "img-3.png",
             "name": "Nesta Technologies"
         }],
@@ -92,7 +92,7 @@
     },{
         "id": 7,
         "shop": [{
-            "img": "assets/images/companies/img-2.png",
+            "img": "/assets/images/companies/img-2.png",
             "img_alt": "img-2.png",
             "name": "Micro Design"
         }],
@@ -107,7 +107,7 @@
     },{
         "id": 8,
         "shop": [{
-            "img": "assets/images/companies/img-1.png",
+            "img": "/assets/images/companies/img-1.png",
             "img_alt": "img-1.png",
             "name": "Force Medicines"
         }],

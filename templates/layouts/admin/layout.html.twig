@@ -2,26 +2,31 @@
 <html lang="fr" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 <head>
 
-  <meta charset="utf-8" />
-  <title>Velzon - Admin & Dashboard Template</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-  <meta content="Themesbrand" name="author" />
+  {% if seo is defined %}
+    {{ generate_seo(seo) }}
+  {% else %}
+    {{ generate_seo() }}
+  {% endif %}
+
   <!-- App favicon -->
   <link rel="apple-touch-icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
   <link rel="icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
   
   <!-- Layout config Js -->
-  <script src="assets/js/layout.js"></script>
+  <script src="{{ asset('assets/js/layout.js') }}"></script>
   <!-- Bootstrap Css -->
-  <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- Icons Css -->
-  <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- App Css-->
-  <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
   <!-- custom Css-->
-  <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+  <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
   {% block stylesheets %}{% endblock %}
+
+  {% if is_markdown is defined and is_markdown == true %}
+    <link rel="stylesheet" href="{{ asset('assets/libs/prismjs/themes/prism.min.css') }}">
+  {% endif %}
 
 </head>
 
@@ -58,7 +63,13 @@
   <!-- END layout-wrapper -->
 
   {{ include('layouts/partials/vendor-scripts.html.twig') }}
-  
+  <script src="{{ asset('js/main.js') }}"></script>
+
+  {% block scripts %}{% endblock %}
+  {% if is_markdown is defined and is_markdown == true %}
+    <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/prismjs.init.js') }}"></script>
+  {% endif %}
   {% block javascripts %}{% endblock %}
 </body>
 

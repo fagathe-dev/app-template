@@ -105,7 +105,7 @@ xhttp.onload = function () {
     });
     companyList.remove("id", `<a href="javascript:void(0);" class="fw-medium link-primary">#VZ001</a>`);
 }
-xhttp.open("GET", "assets/json/company-list.json");
+xhttp.open("GET", "/assets/json/company-list.json");
 xhttp.send();
 
 isCount = new DOMParser().parseFromString(
@@ -443,7 +443,7 @@ function refreshCallbacks() {
 }
 
 function clearFields() {
-    companyLogoImg.src = "assets/images/users/multi-user.jpg";
+    companyLogoImg.src = "/assets/images/users/multi-user.jpg";
     companyNameField.value = "";
     ownerField.value = "";
     industry_typeField.value = "";

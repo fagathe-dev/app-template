@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SeoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SeoRepository::class)]
@@ -41,6 +42,15 @@ class Seo
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $keywords = [];
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $settings = [];
 
     public function __construct()
     {
@@ -162,6 +172,50 @@ class Seo
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getKeywords(): ?array
+    {
+        return $this->keywords;
+    }
+
+    public function setKeywords(?array $keywords): static
+    {
+        $this->keywords = $keywords;
+
+        return $this;
+    }
+
+    public function getSettings(): array
+    {
+        return $this->settings;
+    }
+
+    public function setSettings(?array $settings = null): static
+    {
+        if (empty($settings) || is_null($settings)) {
+            $settings = [
+                'index' => true,
+                'follow' => true,
+                'archive' => true,
+                'snippet' => true,
+            ];
+        }
+        $this->settings = $settings;
 
         return $this;
     }

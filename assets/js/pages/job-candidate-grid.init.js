@@ -6,7 +6,7 @@ Contact: Themesbrand@gmail.com
 File: job candidate grid init js
 */
 
-var url = "assets/json/";
+var url = "/assets/json/";
 var allcandidateList = '';
 
 var prevButton = document.getElementById('page-prev');

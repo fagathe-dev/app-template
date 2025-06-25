@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\User;
+use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -18,16 +19,18 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'app:create-admin-user',
     description: 'Create an admin user',
 )]
-class CreateAdminUserCommand extends Command {
+class CreateAdminUserCommand extends Command
+{
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private UserService $service,
         private UserPasswordHasherInterface $hasher
     ) {
         parent::__construct();
     }
 
-    protected function configure(): void {
+    protected function configure(): void
+    {
         $this
             ->addArgument('username', InputArgument::OPTIONAL, 'Admin username')
             ->addArgument('email', InputArgument::OPTIONAL, 'Admin email')
@@ -35,24 +38,25 @@ class CreateAdminUserCommand extends Command {
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $helper = $this->getHelper('question');
         $io = new SymfonyStyle($input, $output);
 
         $username = $input->getArgument('username');
-        if(!$username) {
+        if (!$username) {
             $question = new Question('Nom d\'utilisateur : ');
             $username = $helper->ask($input, $output, $question);
         }
 
         $email = $input->getArgument('email');
-        if(!$email) {
+        if (!$email) {
             $question = new Question('Adresse e-mail : ');
             $email = $helper->ask($input, $output, $question);
         }
 
         $password = $input->getArgument('password');
-        if(!$password) {
+        if (!$password) {
             $question = new Question('Mot de passe : ');
             $question->setHidden(true);
             $question->setHiddenFallback(false);
@@ -63,12 +67,12 @@ class CreateAdminUserCommand extends Command {
             ->setEmail($email)
             ->setRoles(['ROLE_ADMIN'])
             ->setUsername($username)
-            ->setConfirm(true)
+            ->setActive(true)
             ->setPassword($password)
-            ->setRegisteredAt(new DateTimeImmutable('now'))
+            ->setActive(true)
         ;
 
-        $this->entityManager->persist($user);
+        $this->service->create($user);
         $io->success('A new admin user has been created ! 🚀');
 
         return Command::SUCCESS;

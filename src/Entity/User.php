@@ -6,11 +6,24 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[UniqueEntity(
+    fields: ['email'],
+    errorPath: 'email',
+    message: 'Cette adresse email est déjà utilisée !'
+), UniqueEntity(
+    fields: ['username'],
+    errorPath: 'username',
+    message: 'Ce nom d\'utilisateur est déjà utilisé !'
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -19,6 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message: 'L’email est requis.')]
+    #[Assert\Email(message: 'L’email "{{ value }}" n’est pas valide.')]
     private ?string $email = null;
 
     /**
@@ -45,15 +60,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 160, nullable: true)]
     private ?string $api_token = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $confirm = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $registered_at = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[Assert\NotBlank(message: 'Le nom d’utilisateur est requis.')]
+    #[Assert\Length(min: 3, max: 100, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
     #[ORM\Column(length: 100)]
     private ?string $username = null;
 
@@ -66,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, UserRequest>
      */
-    #[ORM\OneToMany(targetEntity: UserRequest::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: UserRequest::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $requests;
 
     /**
@@ -74,6 +88,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: UserMetadata::class, mappedBy: 'user')]
     private Collection $metadatas;
+
+    #[ORM\Column]
+    private ?bool $active = null;
 
     public function __construct()
     {
@@ -204,18 +221,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isConfirm(): ?bool
-    {
-        return $this->confirm;
-    }
-
-    public function setConfirm(?bool $confirm): static
-    {
-        $this->confirm = $confirm;
-
-        return $this;
-    }
-
     public function getRegisteredAt(): ?\DateTimeImmutable
     {
         return $this->registered_at;
@@ -332,6 +337,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $metadata->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

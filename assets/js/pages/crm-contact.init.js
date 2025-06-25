@@ -137,7 +137,7 @@ xhttp.onload = function () {
     });
     contactList.remove("id", `<a href="javascript:void(0);" class="fw-medium link-primary">#VZ001</a>`);
 }
-xhttp.open("GET", "assets/json/contact-list.json");
+xhttp.open("GET", "/assets/json/contact-list.json");
 xhttp.send();
 
 isCount = new DOMParser().parseFromString(
@@ -500,7 +500,7 @@ function refreshCallbacks() {
 }
 
 function clearFields() {
-    customerImg.src = "assets/images/users/user-dummy-img.jpg";
+    customerImg.src = "/assets/images/users/user-dummy-img.jpg";
     customerNameField.value = "";
     company_nameField.value = "";
     designationField.value = "";
