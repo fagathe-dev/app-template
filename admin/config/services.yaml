@@ -1,0 +1,11 @@
+services:
+ Admin\:
+   resource: '../src/*'
+   exclude: '../src/{Entity,Migrations,Tests}'
+   autowire: true
+   autoconfigure: true
+   public: false
+
+twig:
+ paths:
+   '%kernel.project_dir%/admin/templates': admin
