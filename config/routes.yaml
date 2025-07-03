@@ -1,5 +1,19 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+
+admin_routes:
+  resource:
+    path: ../admin/src/Controller/
+    namespace: Admin\Controller
+  type: attribute
+  prefix: /admin
+
+auth_routes:
+  resource:
+    path: ../auth/src/Controller/
+    namespace: Auth\Controller
+  type: attribute
+  prefix: /auth

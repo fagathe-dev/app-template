@@ -5,12 +5,12 @@ namespace Fagathe\Libs\JSON;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
 
-class JsonService implements JsonPersistInterface
+abstract class JsonService implements JsonPersistInterface
 {
 
-    private const LOG_FILE = 'json-service/json-service';
+    protected const LOG_FILE = 'json-service/json-service';
 
-    private JsonFileManager $jsonFileManager;
+    protected JsonFileManager $jsonFileManager;
 
 
     public function __construct(private string $filePath, private ?array $context = null)
