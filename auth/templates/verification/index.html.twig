@@ -1,0 +1,10 @@
+{% extends "@auth/layout.html.twig" %}
+
+{% block header %}
+  <h5 class="text-primary">{{ title is defined ? title : 'Espace d\'authentification' }}</h5>
+  <p class="text-muted">Vérification de compte</p>
+{% endblock %}
+
+{% block content %}
+  {{ form(form) }}
+{% endblock %}
