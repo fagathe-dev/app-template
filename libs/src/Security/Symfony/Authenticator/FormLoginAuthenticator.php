@@ -21,8 +21,8 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
-    public const FORM_LOGIN_ROUTE = 'app_login';
-    public const DEFAULT_TARGET_PATH = 'app_login';
+    public const FORM_LOGIN_ROUTE = 'auth_login';
+    public const DEFAULT_TARGET_PATH = 'auth_login';
 
     public function __construct(private UrlGeneratorInterface $urlGenerator, private UserRepository $userRepository) {}
 

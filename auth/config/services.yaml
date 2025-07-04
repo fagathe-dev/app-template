@@ -1,11 +1,11 @@
 services:
- Admin\:
-   resource: '../src/*'
-   exclude: '../src/{Entity,Migrations,Tests}'
-   autowire: true
-   autoconfigure: true
-   public: false
+  Auth\:
+    resource: '../src/*'
+    exclude: '../src/{Entity,Migrations,Tests}'
+    autowire: true
+    autoconfigure: true
+    public: false
 
 twig:
- paths:
-   '%kernel.project_dir%/auth/templates': auth
+  paths:
+    '%kernel.project_dir%/auth/templates': auth
