@@ -1,0 +1,6 @@
+{% extends "@admin/layout.html.twig" %}
+
+{% block body %}
+  <h1>Modifier la permission {{ feature.id }}</h1>
+  {% include "@admin/features-access-rules/fragments/_form.html.twig" %}
+{% endblock %}
