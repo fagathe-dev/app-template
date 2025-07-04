@@ -4,8 +4,8 @@ namespace Fagathe\Libs\Security\Enum;
 
 enum RoleEnum: string
 {
-    case ROLE_PUBLIC_ACCESS = 'ROLE_PUBLIC_ACCESS';
-    case ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    case ROLE_PUBLIC_ACCESS = 'PUBLIC_ACCESS';
+    case ROLE_AUTHENTICATED = 'IS_AUTHENTICATED_FULLY';
     case ROLE_USER = 'ROLE_USER';
     case ROLE_EDITOR = 'ROLE_EDITOR';
     case ROLE_MANAGER = 'ROLE_MANAGER';
@@ -61,6 +61,8 @@ enum RoleEnum: string
             self::ROLE_MANAGER => 'Gestionnaire',
             self::ROLE_ADMIN => 'Administrateur',
             self::ROLE_SUPER_ADMIN => 'Super Administrateur',
+            self::ROLE_PUBLIC_ACCESS => 'Accès public',
+            self::ROLE_AUTHENTICATED => 'Authentifié',
             default => 0,
         };
     }
@@ -103,18 +105,20 @@ enum RoleEnum: string
     /**
      * @return array
      */
-    public static function choices(): array
+    public static function choices(bool $withExclusion = true): array
     {
         $cases = static::cases();
         $excludedCases = static::EXCLUDED_ROLES;
         $choices = [];
 
-        foreach ($cases as $case) {
-            if (!in_array($case, $excludedCases)) {
-                $choices[$case->name()] = static::matchLabel($case);
-            }
+        if ($withExclusion) {
+            $cases = array_filter($cases, fn ($case) => !in_array($case, $excludedCases));
         }
 
-        return array_unique($choices);
+        foreach ($cases as $case) {
+            $choices[$case->name()] = static::matchLabel($case);
+        }
+
+        return array_flip(array_unique($choices));
     }
 }

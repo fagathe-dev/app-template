@@ -12,12 +12,13 @@ use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/', name: 'app_home_')]
 class HomeController extends AbstractController
 {
 
     public function __construct(private MailerService $mailer) {}
 
-    #[Route('/', name: 'home')]
+    #[Route('', name: 'index')]
     public function index(): Response
     {
         $file = dirname(__DIR__, 2) . '/public/images/logo-light.png';

@@ -1,0 +1,1 @@
+[{"id":"email.template.list","name":"Affiche la liste des templates d'e-mail","enabled":true,"minimum_access_role":"ROLE_ADMIN"},{"id":"admin.dashboard.view","name":"Accès au dashboard admin en lecture seule","enabled":true,"minimum_access_role":"ROLE_EDITOR"}]
