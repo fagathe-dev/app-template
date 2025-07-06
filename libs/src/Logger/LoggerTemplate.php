@@ -196,7 +196,7 @@ final class LoggerTemplate
      *
      * @return string The generated log template as HTML.
      */
-    public function generateTemplate(): string
+    public function generate(): string
     {
         $this->start();
         $this->generateHeader();

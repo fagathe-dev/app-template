@@ -37,10 +37,10 @@ final class LogController extends AbstractController
         );
     }
 
-    #[Route('', name: 'show', methods: ['GET'])]
-    public function show(): Response
+    #[Route('/show/{date}', name: 'show', methods: ['GET'])]
+    public function show(string $date, Request $request): Response
     {
-        // Render the log index page
-        return $this->render('@admin/log/index.html.twig');
+        $file = $request->query->get('logFile', null);
+        return $this->render('@admin/log/view.html.twig', $this->logService->getFileLogs($file, $date));
     }
 }

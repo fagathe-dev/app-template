@@ -20,3 +20,5 @@ define('APP_SEO_LOCALE', 'fr_FR'); // Locale for SEO tags
 define('APP_SEO_AUTHOR_DEFAULT', 'AGATHE Frédérick'); // Default author for SEO tags
 
 define('APP_EMAIL_CONTACT', ['contact@fagathe-dev.me' => 'Contact fagathe-dev.me']);
+
+define('APP_DS_ASSET_BUILD',true);
