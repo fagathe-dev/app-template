@@ -12,7 +12,7 @@ class BreadcrumbGenerator
     use RequestTrait;
 
     private const DEFAULT_BASE_ROUTE = '/';
-    private const ADMIN_BASE_ROUTE = '/admin';
+    private const ADMIN_BASE_ROUTE = '/admin/dashboard';
 
     public function __construct(
         private ?Breadcrumb $breadcrumb = null

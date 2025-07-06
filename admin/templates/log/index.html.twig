@@ -3,38 +3,57 @@
 {% block body %}
   <div class="row justify-content-beetwen g-2 mb-3">
 
-    <div class="col">
-      <div class="d-flex align-items-center">
-        <div class="flex-shrink-0 me-2 d-block d-lg-none">
-          <button type="button" class="btn btn-soft-success btn-icon btn-sm fs-16 file-menu-btn">
-            <i class="ri-menu-2-fill align-bottom"></i>
-          </button>
-        </div>
-        <div class="flex-grow-1">
-          <h5 class="fs-16 mb-0">Folders</h5>
+    <h1 class="h3 mb-3">Liste des logs</h1>
+    
+    <!--end col-->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="list-group nested-list nested-sortable">
+              {% for date, folders in files %}
+                <div class="list-group-item nested-1" data-id="{{ date }}">
+                  <i class="mdi mdi-folder fs-16 align-middle text-warning me-2"></i>
+                  {{ date }}
+                  {% for key, file in folders %}
+                    <div class="list-group nested-list nested-sortable">
+                      <div class="list-group-item nested-2" data-id="{{ key }}">
+                        {% if key|type == 'integer' %}
+                          <i class="mdi mdi-code-json fs-16 align-middle text-secondary me-2"></i>
+                          <a href="{{ url('admin_log_show', {date: date, logFile: file}) }}">{{ file }}</a>
+                        {% else %}
+                          <i class="mdi mdi-folder fs-16 align-middle text-warning me-2"></i>
+                          {{ key }}
+                          <div class="list-group nested-list nested-sortable">
+                            {% if file|type == 'array' %}
+                              {% for keyitem, item in file %}
+                                <div class="list-group-item nested-3" data-id="{{ keyitem }}">
+                                  <i class="mdi mdi-folder fs-16 align-middle text-warning me-2"></i>
+                                  {{ keyitem }}
+                                  <div class="list-group-item nested-4">
+                                    <i class="mdi mdi-code-json fs-16 align-middle text-secondary me-2"></i>
+                                    <a href="{{ url('admin_log_show', {date: date, logFile: key ~ '_' ~ keyitem ~ '_' ~ item}) }}">{{ item }}</a>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              <div class="list-group-item nested-3">
+                                <i class="mdi mdi-code-json fs-16 align-middle text-secondary me-2"></i>
+                                <a href="{{ url('admin_log_show', {date: date, logFile: key ~ '_' ~ file}) }}">{{ file }}</a>
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <!--end col-->
-    <div class="col-auto">
-        <div class="d-flex gap-2 align-items-start" id="logFilesFilter">
-          <select name="logDay" id="logDay" class="form-select" onchange="setUpDate(event);">
-            {% for day in dates %}
-              <option value="{{ day }}">{{ day }}</option>
-            {% endfor %}
-          </select>
-
-          <button class="btn btn-primary w-sm create-folder-modal flex-shrink-0"> <i class="ri-refresh-line align-bottom me-1"></i> Actualiser</button>
-        </div>
-    </div>
-    <!--end col-->
 </div>
-{% endblock %}
-
-{% block javascripts %}
-  <script>
-    const API_LOG_FILES_GET = '{{ url('admin_log_files') }}';
-    var exports = {};
-  </script>
-  <script type="module" src="{{ asset('js/admin/log.js') }}"></var>
 {% endblock %}

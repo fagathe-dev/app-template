@@ -33,7 +33,7 @@
 
   <!-- Begin page -->
   <div class="layout-wrapper landing">
-    {% include "layouts/partials/navbar.html.twig" %}
+    {% include "partials/navbar.html.twig" %}
     {% if banner is defined %}
       <section class="hero-section">
         <div class="profile-wid-bg profile-setting-img">
@@ -114,10 +114,10 @@
     {% endif %}
     
     <section class="container py-3">
-      {% include "layouts/partials/breadcrumb.html.twig" with {title: 'Whatever title !', pagetitle: 'Page Title'} %}
+      {% include "partials/breadcrumb.html.twig" with {title: 'Whatever title !', pagetitle: 'Page Title'} %}
     </section>
 
-    {% include "layouts/partials/footer.html.twig" %}
+    {% include "partials/footer.html.twig" %}
 
     <!--start back-to-top-->
     <button onclick="topFunction()" class="btn btn-info btn-icon landing-back-top" id="back-to-top">
@@ -128,7 +128,7 @@
   </div>
   <!-- end layout wrapper -->
   
-  {{ include('layouts/partials/vendor-scripts.html.twig') }}
+  {{ include('partials/vendor-scripts.html.twig') }}
 
   <!--Swiper slider js-->
   <script src="{{ asset('assets/libs/swiper/swiper-bundle.min.js') }}"></script>
