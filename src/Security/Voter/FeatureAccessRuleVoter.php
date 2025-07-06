@@ -4,6 +4,8 @@
 namespace App\Security\Voter;
 
 use Admin\Service\FeatureAccessRuleService;
+use Fagathe\Libs\Logger\Logger;
+use Fagathe\Libs\Logger\LoggerLevelEnum;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,19 +20,24 @@ class FeatureAccessRuleVoter extends Voter
     public const USER_PROFILE_EDIT = 'user_profiles_edit';
     public const COMMENTING = 'commenting';
     public const PUBLIC_HOMEPAGE_FEATURE = 'public_homepage_feature';
+    private const LOG_FILE = 'security/feature-access-rule-voter';
 
 
     public function __construct(
-        private readonly FeatureAccessRuleService $featureService, 
+        private readonly FeatureAccessRuleService $featureService,
         private readonly Security $security
-    ) {
-    }
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         // Vérifier si l'attribut est une fonctionnalité que nous gérons (par son ID)
         $featureConfig = $this->featureService->getFeatureConfig($attribute);
         if (null === $featureConfig) {
+            $this->generateLog(
+                ['message' => 'Contrôle de permission `' . $attribute . '` non reconnu'],
+                ['action' => __METHOD__],
+                LoggerLevelEnum::Debug,
+            );
             return false; // Ce n'est pas une fonctionnalité que nous connaissons
         }
 
@@ -60,20 +67,20 @@ class FeatureAccessRuleVoter extends Voter
 
         // Récupérer la configuration d'accès(permission) de la fonctionnalité
         $featureConfig = $this->featureService->getFeatureConfig($featureId);
-        
+
         // Si la fonctionnalité n'existe pas ou n'est pas définie, on refuse l'accès par défaut.
         if (null === $featureConfig) {
             return false;
         }
-        
+
         // Vérifier si le contrôle de l'accès est actif
         if (!($featureConfig->isEnabled() ?? false)) {
             return true; // Si le controle d'accès est désactivé, on autorise l'accès.
         }
-        
+
         $minimumAccessRole = $featureConfig->getMinimumAccessRole() ?? null;
         $resourceOwner = null;
-        
+
         // 4. Vérifier l'accès par rôle minimum
         $hasRoleAccess = false;
         if (null === $minimumAccessRole) {
@@ -94,6 +101,11 @@ class FeatureAccessRuleVoter extends Voter
             // 3. Récupérer le rôle minimum requis
             if ($featureConfig->hasOwnerVerification()) {
                 if ($user === null) {
+                    $this->generateLog(
+                        ['message' => 'Accès refusé : utilisateur non authentifié pour cette fonctionnalité `' . $featureId . '`'],
+                        ['action' => __METHOD__],
+                        LoggerLevelEnum::Warning,
+                    );
                     return false; // Si l'utilisateur n'est pas authentifié, on refuse l'accès
                 }
 
@@ -121,6 +133,13 @@ class FeatureAccessRuleVoter extends Voter
         }
 
         $canProceed = $hasRoleAccess; // On met à jour la variable canProceed avec le résultat de la vérification du rôle
+        if (!$hasRoleAccess) {
+            $this->generateLog(
+                ['message' => 'Accès refusé : rôle insuffisant pour la fonctionnalité `' . $featureId . '`'],
+                ['action' => __METHOD__, 'uid' => $user?->getUserIdentifier() ?? 'anonymous'],
+                LoggerLevelEnum::Warning,
+            );
+        }
 
         return $canProceed;
     }
@@ -146,5 +165,18 @@ class FeatureAccessRuleVoter extends Voter
             return $resource->getAuthor();
         }
         return null;
+    }
+
+    /**
+     * @param array $content
+     * @param array $context
+     * @param LoggerLevelEnum $level
+     * 
+     * @return void
+     */
+    private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
+    {
+        $logger = new Logger(static::LOG_FILE, boolLogIP: false);
+        $logger->log($level, $content, $context);
     }
 }

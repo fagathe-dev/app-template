@@ -1,0 +1,12 @@
+{% extends "@admin/layout.html.twig" %}
+
+{% block body %}
+  <h1 class="h3 mb-3">Log de {{ filename }}</h1>
+
+  {% for log in logs %}
+    {{ generate_logger_template(log)|raw}}
+  {% endfor %}
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}

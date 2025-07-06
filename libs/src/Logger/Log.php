@@ -70,11 +70,14 @@ final class Log
     /**
      * Sets the log level.
      *
-     * @param LoggerLevelEnum $level The log level to set.
+     * @param string $level The log level to set.
      * @return self
      */
-    public function setLevel(LoggerLevelEnum $level): self
+    public function setLevel(string|LoggerLevelEnum $level): self
     {
+        if (is_string($level)) {
+            $level = LoggerLevelEnum::tryFrom($level);
+        }
         $this->level = $level;
 
         return $this;
@@ -246,13 +249,13 @@ final class Log
     /**
      * Sets the timestamp of the log.
      *
-     * @param null|DateTimeImmutable $timestamp The timestamp to set.
+     * @param null|string $timestamp The timestamp to set.
      * 
      * @return self
      */
-    public function setTimestamp(DateTimeImmutable $timestamp): self
+    public function setTimestamp(string $timestamp): self
     {
-        $this->timestamp = $timestamp;
+        $this->timestamp = new DateTimeImmutable($timestamp);
 
         return $this;
     }
@@ -264,7 +267,7 @@ final class Log
      */
     public function generate(): string
     {
-        return (new LoggerTemplate($this))->generateTemplate();
+        return (new LoggerTemplate($this))->generate();
     }
 
     /**

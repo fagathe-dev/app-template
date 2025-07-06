@@ -4,6 +4,7 @@ namespace Fagathe\Libs\Logger;
 
 use DateTimeImmutable;
 use Fagathe\Libs\DetectDevice\DetectDevice;
+use Fagathe\Libs\Helpers\DateTimeTrait;
 use Fagathe\Libs\Helpers\IPChecker;
 use Fagathe\Libs\Helpers\Token\EncodeTrait;
 use Fagathe\Libs\JSON\JsonSerializer;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 final class Logger
 {
-    use EncodeTrait;
+    use EncodeTrait, DateTimeTrait;
 
     private Request $request;
     private JsonLogService $jsonLogService;
@@ -137,14 +138,15 @@ final class Logger
      */
     public function log(LoggerLevelEnum $level = LoggerLevelEnum::Info, array $content = [], array $context = []): void
     {
-        $dateTime = new DateTimeImmutable();
+        $now = $this->now();
+        $dateTime = $now->format('Y-m-d H:i:s');
         $log = (new Log())
             ->setLevel($level)
             ->setContent($content)
             ->setContext($this->getContext())
             ->setTimestamp($dateTime)
             ->setOrigin($this->getOrigin())
-            ->setId('LOG_' . $dateTime->format('YmdHis'));
+            ->setId('LOG_' . $now->format('YmdHis'));
 
         foreach ($context as $key => $value) {
             if (in_array($key, Log::CONTEXT_KEYS)) {
@@ -173,11 +175,11 @@ final class Logger
         if ($emailSession !== null) {
             $context['uid'] = $emailSession;
         }
-        
+
         if (isset($_COOKIE[static::LOG_CONTEXT])) {
-            
+
             $context = $this->decodeBase64($_COOKIE[static::LOG_CONTEXT]);
-            
+
             if (isset($context['uid']) && $context['uid'] !== 'anonymous' && $emailSession !== null) {
                 $boolRenewContext = true;
             }
@@ -190,7 +192,7 @@ final class Logger
             if ($this->boolLogIP) {
                 $context['ip'] = $this->ipChecker->getIp();
             }
-            
+
             $context = [
                 ...$context,
                 'device' => $this->detectDevice->getDeviceType()->value,
