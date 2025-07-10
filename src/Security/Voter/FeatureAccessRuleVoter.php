@@ -36,7 +36,7 @@ class FeatureAccessRuleVoter extends Voter
             $this->generateLog(
                 ['message' => 'Contrôle de permission `' . $attribute . '` non reconnu'],
                 ['action' => __METHOD__],
-                LoggerLevelEnum::Debug,
+                LoggerLevelEnum::Warning,
             );
             return false; // Ce n'est pas une fonctionnalité que nous connaissons
         }
@@ -176,7 +176,7 @@ class FeatureAccessRuleVoter extends Voter
      */
     private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
     {
-        $logger = new Logger(static::LOG_FILE, boolLogIP: false);
+        $logger = new Logger(static::LOG_FILE);
         $logger->log($level, $content, $context);
     }
 }

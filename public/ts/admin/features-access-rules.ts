@@ -1,15 +1,18 @@
-// public/js/features-access-rules.js
-async function deleteFeature (e) {
+import { fetchAPI } from '../utils/fetch';
+import { URLHandler } from '../utils/url';
+
+const deleteFeature = async (e: MouseEvent) => {
   e.preventDefault();
-  const url = (e.target.tagName !== 'A' ? e.target.closest('a[href]') : e.target).getAttribute('href');
+  const targetElement = e.target as HTMLElement | HTMLAnchorElement;
+  const url: string =
+    targetElement.tagName !== 'A'
+      ? (targetElement.closest('a[href]') as HTMLAnchorElement).href
+      : (targetElement as HTMLAnchorElement).href;
 
   if (confirm('Êtes-vous sûr de vouloir supprimer cette fonctionnalité ?')) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchAPI(url, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
       if (res.ok) {
@@ -23,7 +26,8 @@ async function deleteFeature (e) {
       }
     } catch (error) {
       console.error('Erreur:', error);
-      alert("Une erreur s'est produite lors de la suppression de la fonctionnalité.");
     }
   }
 };
+
+const xyz = URLHandler.getAllURLParams();

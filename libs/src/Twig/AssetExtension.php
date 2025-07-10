@@ -1,13 +1,17 @@
 <?php
 namespace Fagathe\Libs\Twig;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AssetExtension extends AbstractExtension
 {
 
-    public function __construct(private string $env = 'prod')
+    public function __construct(
+        #[Autowire('%kernel.environment%')]
+        private readonly string $env
+    )
     {
         // Constructor code if needed
     }
@@ -15,11 +19,11 @@ class AssetExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction("app_asset", [$this, "appdsAsset"]),
+            new TwigFunction("app_template_asset", [$this, "appTemplateAsset"]),
         ];
     }
 
-    public function appAsset(string $asset, $type = "css"): string
+    public function appTemplateAsset(string $asset, $type = "css"): string
     {
         if ($this->env === 'dev') {
             return '/' . $asset;
