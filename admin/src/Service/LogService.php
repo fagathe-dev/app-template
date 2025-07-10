@@ -2,6 +2,7 @@
 
 namespace Admin\Service;
 
+use DateTimeImmutable;
 use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
 use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
 use Fagathe\Libs\Logger\JsonLogService;
@@ -70,16 +71,33 @@ final class LogService
             }
         }
 
-        $dates = array_keys($files);
+        // Utilisation de uksort pour trier par les clés (dates)
+        uksort($files, function ($dateA, $dateB) {
+            // Convertir les chaînes de caractères JJ-MM-AAAA en objets DateTime pour une comparaison fiable
+            $dateTimeA = DateTimeImmutable::createFromFormat('d-m-Y', $dateA);
+            $dateTimeB = DateTimeImmutable::createFromFormat('d-m-Y', $dateB);
 
-        return compact('files', 'dates', 'breadcrumb');
+            // Gérer les erreurs de format (si une date n'est pas valide)
+            if ($dateTimeA === false || $dateTimeB === false) {
+                return 0; // Traiter comme égales si une erreur survient
+            }
+
+            // Comparer les objets DateTime pour un tri descendant (plus récent d'abord)
+            if ($dateTimeA == $dateTimeB) {
+                return 0; // Les dates sont égales
+            }
+            // L'inverse de la comparaison précédente : -1 si B est plus ancien que A (donc A doit venir avant), 1 si A est plus ancien
+            return ($dateTimeA > $dateTimeB) ? -1 : 1;
+        });
+
+        return compact('files', 'breadcrumb');
     }
 
     public function getFileLogs(string $filename, string $date): array
     {
         $filePath = str_replace('_', '/', $filename) . '-' . $date;
         $logs = null;
-        
+
         $breadcrumb = $this->breadcrumb([
             new BreadcrumbItem(
                 join(' > ', explode('_', $filename)),

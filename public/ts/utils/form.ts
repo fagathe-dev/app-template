@@ -258,3 +258,5 @@ const formManager = new FormManager({ form: document.getElementById('formManager
 formManager.validateData(violations);
 
 // formManager.reset();
+
+export { FormManager, FormDataType};
