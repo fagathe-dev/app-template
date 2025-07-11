@@ -27,7 +27,7 @@ class FeatureAccessRuleController extends AbstractController
     ) {}
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function listFeatures(): Response
+    public function index(): Response
     {
         return $this->render('@admin/features-access-rules/index.html.twig', $this->featureService->index());
     }
@@ -44,7 +44,7 @@ class FeatureAccessRuleController extends AbstractController
         }
 
         // Créer le formulaire et le pré-remplir avec le DTO
-        $form = $this->createForm(FeatureAccessRuleType::class, $feature);
+        $form = $this->createForm(FeatureAccessRuleType::class, $feature, ['root_id' => $id]);
         $form->handleRequest($request); // Traiter la requête, même si c'est une GET
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -62,6 +62,7 @@ class FeatureAccessRuleController extends AbstractController
             ...$this->featureService->edit($id)
         ]);
     }
+
     // Nouvelle action pour afficher le formulaire d'édition
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function addFeature(Request $request): Response
@@ -99,7 +100,6 @@ class FeatureAccessRuleController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $this->featureService->deleteFeature($id);
-        $this->addFlash('success', 'La fonctionnalité a été supprimée avec succès.');
         return $this->json(data: [], status: Response::HTTP_OK);
     }
 

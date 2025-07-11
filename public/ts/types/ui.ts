@@ -7,4 +7,7 @@ interface SnackBarOptions {
   autoHide?: boolean;
 }
 
-export { SnackBarStatus, SnackBarTextColor, SnackBarOptions };
+type AlertTextColor = 'white' | 'dark';
+type AlertStatus = 'success' | 'danger' | 'warning' | 'info' | 'primary';
+
+export { SnackBarStatus, SnackBarTextColor, SnackBarOptions, AlertStatus };

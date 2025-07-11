@@ -1,4 +1,4 @@
-import { SnackBarOptions, SnackBarStatus, SnackBarTextColor } from "../types/snackbar";
+import { SnackBarOptions, SnackBarStatus, SnackBarTextColor } from '../types/ui';
 
 class SnackBar {
   content: HTMLDivElement | null = null;

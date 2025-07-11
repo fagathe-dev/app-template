@@ -114,7 +114,8 @@
     {% endif %}
     
     <section class="container py-3">
-      {% include "partials/breadcrumb.html.twig" with {title: 'Whatever title !', pagetitle: 'Page Title'} %}
+      {% include "components/breadcrumb.html.twig" with {title: 'Whatever title !', pagetitle: 'Page Title'} %}
+      {% include "components/flashes.html.twig" %}
     </section>
 
     {% include "partials/footer.html.twig" %}

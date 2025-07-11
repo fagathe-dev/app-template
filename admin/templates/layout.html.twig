@@ -46,7 +46,8 @@
       <div class="page-content">
         <div class="container-fluid">
 
-          {{ include('@admin/fragments/page-title.html.twig', {pagetitle: 'Pages', title: 'Starter'}) }}
+          {{ include('@admin/components/page-title.html.twig', {pagetitle: 'Pages', title: 'Starter'}) }}
+          {% include "components/flashes.html.twig" %}
 
           {% block body %}{% endblock %}
 

@@ -216,7 +216,7 @@ class FeatureAccessRuleService
         if ($key === null) {
             throw new \InvalidArgumentException("Feature with ID '$id' not found.");
         }
-        unset($features[$key]); // Supprimer la fonctionnalité par sa clé
+        // unset($features[$key]); // Supprimer la fonctionnalité par sa clé
 
         $this->persistFeatureConfig($features);
     }

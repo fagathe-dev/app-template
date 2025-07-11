@@ -1,3 +1,4 @@
+import { Alert } from '../components/Alert';
 import { fetchAPI } from '../utils/fetch';
 import { URLHandler } from '../utils/url';
 
@@ -16,15 +17,21 @@ const deleteFeature = async (e: MouseEvent) => {
       });
 
       if (res.ok) {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-        window.location.reload();
+        new Alert('La fonctionnalité a été supprimée avec succès 🚀');
+
+        setTimeout(() => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          });
+          window.location.reload();
+        }, 4000);
       } else {
         console.error('Erreur lors de la suppression de la fonctionnalité.');
+        new Alert('Erreur lors de la suppression de la fonctionnalité.', 'danger');
       }
     } catch (error) {
+      console.error('Erreur lors de la suppression de la fonctionnalité.');
       console.error('Erreur:', error);
     }
   }
