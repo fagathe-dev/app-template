@@ -5,6 +5,8 @@ namespace Admin\Service;
 use App\DTO\FeatureAccessRuleDTO;
 use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
 use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
+use Fagathe\Libs\Logger\Logger;
+use Fagathe\Libs\Logger\LoggerLevelEnum;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -12,6 +14,8 @@ class FeatureAccessRuleService
 {
     private const DATA_FILE = '/data/features_access_rules.json';
     private string $filePath;
+    private const LOG_FILE = 'service/feature-access-rule';
+
     public function __construct(
         private KernelInterface $kernel,
         private readonly UrlGeneratorInterface $urlGenerator,
@@ -127,6 +131,11 @@ class FeatureAccessRuleService
             $featureToUpdate['minimum_access_role'] = $featureDTO->getMinimumAccessRole(); // Changement ici
             $featureToUpdate['requires_owner_match'] = $featureDTO->getRequiresOwnerMatch();
             $featureToUpdate['strict_owner_only'] = $featureDTO->isStrictOwnerOnly(); // Ajout de la propriété strictOwnerOnly
+            $this->generateLog(
+                ['message' => 'Feature access rule `' . $featureId . '` updated.'],
+                ['action' => __METHOD__],
+                LoggerLevelEnum::Info,
+            );
 
             $features[$key] = $this->clearFeatureStructure($featureToUpdate); // On met à jour la fonctionnalité
         }
@@ -160,6 +169,11 @@ class FeatureAccessRuleService
         ];
 
         array_push($features, $this->clearFeatureStructure($newFeature));
+        $this->generateLog(
+            ['message' => 'Feature access rule `' . $featureDTO->getId() . '` updated.'],
+            ['action' => __METHOD__],
+            LoggerLevelEnum::Info,
+        );
         $this->persistFeatureConfig($features);
     }
 
@@ -216,7 +230,12 @@ class FeatureAccessRuleService
         if ($key === null) {
             throw new \InvalidArgumentException("Feature with ID '$id' not found.");
         }
-        // unset($features[$key]); // Supprimer la fonctionnalité par sa clé
+        $this->generateLog(
+            ['message' => 'Feature access rule `' . $id . '` deleted.'],
+            ['action' => __METHOD__],
+            LoggerLevelEnum::Info,
+        );
+        unset($features[$key]); // Supprimer la fonctionnalité par sa clé
 
         $this->persistFeatureConfig($features);
     }
@@ -230,5 +249,18 @@ class FeatureAccessRuleService
             }
         }
         return false; // L'ID n'existe pas
+    }
+
+    /**
+     * @param array $content
+     * @param array $context
+     * @param LoggerLevelEnum $level
+     * 
+     * @return void
+     */
+    private function generateLog(array $content, array $context = [], LoggerLevelEnum $level = LoggerLevelEnum::Error): void
+    {
+        $logger = new Logger(static::LOG_FILE);
+        $logger->log($level, $content, $context);
     }
 }
