@@ -2,12 +2,6 @@
 <html lang="fr" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 <head>
 
-  {% if seo is defined %}
-    {{ generate_seo(seo) }}
-  {% else %}
-    {{ generate_seo() }}
-  {% endif %}
-
   <!-- App favicon -->
   <link rel="apple-touch-icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
   <link rel="icon" href="{{ asset('images/logo.webp') }}" type="image/webp" >
@@ -24,9 +18,7 @@
   <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
   {% block stylesheets %}{% endblock %}
 
-  {% if is_markdown is defined and is_markdown == true %}
-    <link rel="stylesheet" href="{{ asset('assets/libs/prismjs/themes/prism.min.css') }}">
-  {% endif %}
+  {% include "partials/markdown.html.twig" %}
 
 </head>
 
@@ -46,7 +38,8 @@
       <div class="page-content">
         <div class="container-fluid">
 
-          {{ include('@admin/fragments/page-title.html.twig', {pagetitle: 'Pages', title: 'Starter'}) }}
+          {{ include('@admin/components/page-title.html.twig', {pagetitle: 'Pages', title: 'Starter'}) }}
+          {% include "components/flashes.html.twig" %}
 
           {% block body %}{% endblock %}
 
@@ -63,13 +56,8 @@
   <!-- END layout-wrapper -->
 
   {{ include('@admin/fragments/vendor-scripts.html.twig') }}
-  <script src="{{ asset('js/main.js') }}"></script>
 
   {% block scripts %}{% endblock %}
-  {% if is_markdown is defined and is_markdown == true %}
-    <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/prismjs.init.js') }}"></script>
-  {% endif %}
   {% block javascripts %}{% endblock %}
 </body>
 

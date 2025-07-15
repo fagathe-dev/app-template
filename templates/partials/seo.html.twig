@@ -1,0 +1,5 @@
+{% if seo is defined %}
+  {{ generate_seo(seo) }}
+{% else %}
+  {{ generate_seo() }}
+{% endif %}

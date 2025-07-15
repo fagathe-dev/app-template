@@ -144,19 +144,24 @@ final class LoggerTemplate
         }
 
         if ($this->log->hasContent('data')) {
-            $html .= '<p class="' . $titleClass . '">Data : </p><div class="live-preview"><pre><code class="language-json">' . htmlentities(json_encode($this->log->getContent('data'), JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8') . '</code></pre></div>';
+            $html .= '<p class="' . $titleClass . '">Data : </p><div class="live-preview"><pre><code class="language-json">' . $this->niceJson($this->log->getContent('data')) . '</code></pre></div>';
         }
 
         if ($this->log->hasContent('exception')) {
-            $html .= '<p class="' . $titleClass . '">Exception : </p><div class="live-preview"><pre><code class="language-json">' . htmlentities(json_encode($this->log->getContent('exception'), JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8') . '</code></pre></div>';
+            $html .= '<p class="' . $titleClass . '">Exception : </p><div class="live-preview"><pre><code class="language-json">' . $this->niceJson($this->log->getContent('exception')) . '</code></pre></div>';
         }
 
         if ($this->log->hasContent('ws_return')) {
-            $html .= '<p class="' . $titleClass . '">Retour WS : </p><div class="live-preview"><pre><code class="language-json">' . htmlentities(json_encode($this->log->getContent('ws_return'), JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8') . '</code></pre></div>';
+            $html .= '<p class="' . $titleClass . '">Retour WS : </p><div class="live-preview"><pre><code class="language-json">' . $this->niceJson($this->log->getContent('ws_return')) . '</code></pre></div>';
         }
 
         $html .= '</div>';
         $this->addHTML($html);
+    }
+
+    private function niceJson(string $json): string
+    {
+        return htmlentities(json_encode($json, JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8');
     }
 
     /**

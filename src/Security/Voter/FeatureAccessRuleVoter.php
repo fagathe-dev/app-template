@@ -20,7 +20,7 @@ class FeatureAccessRuleVoter extends Voter
     public const USER_PROFILE_EDIT = 'user_profiles_edit';
     public const COMMENTING = 'commenting';
     public const PUBLIC_HOMEPAGE_FEATURE = 'public_homepage_feature';
-    private const LOG_FILE = 'security/feature-access-rule-voter';
+    private const LOG_FILE = 'security/feature-access-rule';
 
 
     public function __construct(
