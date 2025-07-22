@@ -24,19 +24,23 @@ class FeatureAccessRuleType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
+        $id = $options['root_id'] ?? null;
         $builder
             ->add('id', TextType::class, [
                 'label' => 'Identifiant de la fonctionnalité',
                 'constraints' => [
                     // Voici la validation d'unicité custom sous forme de Callback
                     new Callback([
-                        'callback' => function (?string $value, ExecutionContextInterface $context): void {
+                        'callback' => function (?string $value, ExecutionContextInterface $context) use ($id): void {
                             // Si l'ID est vide, d'autres validateurs (NotBlank) le géreront
                             if (null === $value || '' === $value) {
                                 return;
                             }
-                            
+
+                            if ($id !== null && $id === $value) {
+                                return;
+                            }
+
                             // Vérifier si l'ID existe déjà
                             $existingFeature = $this->featureService->checkIfIDExists($value);
 
@@ -88,6 +92,7 @@ class FeatureAccessRuleType extends AbstractType
             'data_class' => FeatureAccessRuleDTO::class,
             'csrf_protection' => true,
             'is_creation_mode' => false, // Par défaut, ce n'est pas en mode création
+            'root_id' => null,
         ]);
     }
 

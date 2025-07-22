@@ -1,5 +1,5 @@
 // public/js/features-access-rules.js
-const deleteFeature = async (e) => {
+async function deleteFeature (e) {
   e.preventDefault();
   const url = (e.target.tagName !== 'A' ? e.target.closest('a[href]') : e.target).getAttribute('href');
 

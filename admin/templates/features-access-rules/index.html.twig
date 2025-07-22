@@ -51,7 +51,7 @@
               <a href="{{ path('admin_features_access_rules_edit', {'id': feature.id}) }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-pencil-square"></i> Éditer
               </a>
-              <a href="{{ path('admin_features_access_rules_delete', {'id': feature.id}) }}" class="btn btn-sm btn-danger" onclick="deleteFeature(event)">
+              <a href="{{ path('admin_features_access_rules_delete', {'id': feature.id}) }}" class="btn btn-sm btn-danger" onclick="deleteFeature(event);">
                 <i class="bi bi-trash"></i> Supprimer
               </a>
             </td>
@@ -68,5 +68,5 @@
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{{ asset('js/features-access-rules.js') }}"></script>
+  <script src="{{ asset('js/admin/features-access-rules.js') }}"></script>
 {% endblock %}

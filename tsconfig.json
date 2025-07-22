@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-      "target": "ES6",
-      "module": "commonjs",
+      "target": "ESNext", // Ou "ES2020", "ES2021", etc.
+      "module": "ESNext", // C'est la clé ! Génère des modules ES natifs (import/export)
       "strictNullChecks": true,
       "noImplicitAny": false,
       "strictFunctionTypes": false,

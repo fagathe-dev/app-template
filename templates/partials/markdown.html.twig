@@ -1,0 +1,5 @@
+{% if is_markdown is defined and is_markdown == true %}
+  <link rel="stylesheet" href="{{ asset('assets/libs/prismjs/themes/prism.min.css') }}">
+  <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
+  <script src="{{ asset('assets/js/pages/prismjs.init.js') }}"></script>
+{% endif %}

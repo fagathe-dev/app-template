@@ -1,6 +1,6 @@
 <?php
 
-namespace Fagathe\Libs\SEO\Meta;
+namespace Fagathe\Libs\SEO;
 
 use App\Entity\Seo;
 
