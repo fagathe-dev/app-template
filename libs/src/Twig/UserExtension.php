@@ -20,7 +20,7 @@ class UserExtension extends AbstractExtension
     {
         $roles = [];
         foreach ($user->getRoles() as $role) {
-            $role[] = $this->niceRole($role);
+            $roles[] = $this->niceRole($role);
         }
 
         return join(', ', $roles);

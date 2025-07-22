@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use Fagathe\Libs\Helpers\DateTimeTrait;
+use Fagathe\Libs\Helpers\Request\NativeSession;
 use Fagathe\Libs\Helpers\Request\ResponseTrait;
 use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
@@ -104,36 +105,48 @@ final class UserService
      * save
      *
      * @param  User $user
+     * @param bool $boolCreate
+     * 
      * @return bool
      */
-    public function save(User $user): bool
+    public function save(User $user, bool $boolCreate = false): bool
     {
+        $now = $this->now();
+        if ($boolCreate) {
+            $user->setRegisteredAt($now)
+                ->setIdentifier($user->getEmail())
+            ;
+        } else {
+            $user->setUpdatedAt($now);
+        }
+
+        $username = $user?->getUserIdentifier() ?? 'anonymous';
+        $creator = $this->getUser()?->getUserIdentifier();
+
         try {
             $this->manager->persist($user);
             $this->manager->flush();
+
+            $result = true;
+        } catch (\Throwable $th) {
             $this->generateLog(
-                content: ['message' => sprintf('Enregistrement des données de l\'utilisateur %s réussi.', $user->getUsername())],
-                context: ['action' => __METHOD__],
-                level: LoggerLevelEnum::Info
+                ['exception' => $th->getMessage()],
+                ['action' => __METHOD__, 'uid' => $creator],
+                LoggerLevelEnum::Error,
             );
-            return true;
-        } catch (ORMException $e) {
-            $this->addFlash('danger', $e->getMessage());
-            $this->generateLog(
-                content: ['exception' => 'Une erreur est survenue lors de l\'enregistrement des données :' . $e->getMessage()],
-                context: ['action' => __METHOD__],
-                level: LoggerLevelEnum::Error
-            );
-            return false;
-        } catch (Exception $e) {
-            $this->addFlash('danger', $e->getMessage());
-            $this->generateLog(
-                content: ['exception' => 'Une erreur est survenue lors de l\'enregistrement des données :' . $e->getMessage()],
-                context: ['action' => __METHOD__],
-                level: LoggerLevelEnum::Error
-            );
+
             return false;
         }
+
+        $message =  'L\' utilisateur `' . $username . '` a été ' . ($boolCreate ? 'crée' : 'mis à jour') . ' par ' . $creator;
+
+        $this->generateLog(
+            ['message' => $message],
+            ['action' => __METHOD__, 'uid' => $creator ?? 'anonymous'],
+            LoggerLevelEnum::Debug,
+        );
+
+        return $result;
     }
 
     /**
@@ -171,6 +184,23 @@ final class UserService
     }
 
     /**
+     * @param UserRequest $userRequest
+     * 
+     * @return bool
+     */
+    public function activate(UserRequest $userRequest): bool
+    {
+        $session = new NativeSession();
+        $session->set(UserRequestService::VERIFICATION_REDIRECT_ROUTE_NAME, $this->urlGenerator->generate('auth_login'));
+        dd($this->urlGenerator->generate('auth_login'));
+
+
+        $user = $userRequest->getUser();
+        $user->setActive(true)
+            ->setUpdatedAt($this->now());
+        return $this->save($user, false);
+    }
+    /**
      * @param string $plainPassword
      * @param User $user
      * 
@@ -206,23 +236,6 @@ final class UserService
             $nbItems, /*limit per page*/
         );
     }
-
-    // /**
-    //  * index
-    //  *
-    //  * @param  mixed $request
-    //  * @return array
-    //  */
-    // public function index(Request $request): array
-    // {
-    //     $breadcrumb = new Breadcrumb([
-    //         new BreadcrumbItem('Liste des utilisateurs'),
-    //     ]);
-
-    //     $paginatedUsers = $this->getUsers($request);
-
-    //     return compact('paginatedUsers', 'breadcrumb');
-    // }
 
     /**
      * get logged User

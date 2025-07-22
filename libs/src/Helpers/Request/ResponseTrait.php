@@ -82,6 +82,6 @@ trait ResponseTrait
     public function addFlash(string $message, string $type = 'info'): void
     {
         $session = new Session;
-        $session->getFlashBag()->add($type, $message);
+        $session->getFlashBag()->add($message, $type);
     }
 }
