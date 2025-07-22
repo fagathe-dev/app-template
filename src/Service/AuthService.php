@@ -36,35 +36,6 @@ final class AuthService
     ) {}
 
     /**
-     * @param array $data
-     * 
-     * @return bool
-     */
-    public function verificationIndex(array $data): bool
-    {
-        $email = $data['email'] ?? null;
-        // Get the logged user
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-        if (!$user instanceof User) {
-            $errorMsg = sprintf('Aucun utilisateur trouvé avec l\'adresse e-mail %s.', $email);
-            $this->generateLog(
-                content: ['message' => $errorMsg],
-                context: ['action' => __METHOD__],
-                level: LoggerLevelEnum::Info
-            );
-            $this->addFlash('danger', $errorMsg);
-
-            return false;
-        }
-
-        $this->sendVerificationEmail($user);
-        $this->addFlash('success', 'Un e-mail de vérification a été envoyé à l\'adresse saisie. Veuillez vérifier votre boîte e-mail.');
-
-        return false;
-    }
-
-    /**
      * @param string $token
      * 
      * @return bool

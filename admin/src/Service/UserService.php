@@ -4,18 +4,20 @@ namespace Admin\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use DateTimeImmutable;
+use App\Service\UserRequestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
 use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
 use Fagathe\Libs\Helpers\DateTimeTrait;
-use Fagathe\Libs\Logger\JsonLogService;
-use Fagathe\Libs\Logger\Log;
+use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
+use Fagathe\Libs\Utils\UserRequestEnum;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -34,14 +36,84 @@ final class UserService
         private readonly Security $security,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly EntityManagerInterface $entityManager,
+        private readonly PaginatorInterface $paginator,
+        private readonly UserRequestService $userRequestService,
 
     ) {
         $this->finder = new Finder();
     }
 
 
-    public function add(User $user) {}
+    /**
+     * @param User $user
+     * 
+     * @return void
+     */
+    public function create(User $user)
+    {
+        $password = (new Token)->generate(30);
+        $user = $this->hashPassword($user->setPassword($password));
+        $this->save($user, true);
 
+        $this->userRequestService->create(
+            user: $user,
+            type: UserRequestEnum::ACCOUNT_ADMIN_CREATION_REQUEST,
+            data: [
+                'password' => $password,
+            ],
+        );
+    }
+
+    /**
+     * @param  mixed $request
+     * @return PaginationInterface
+     */
+    public function getUsers(Request $request): PaginationInterface
+    {
+
+        $data = $this->repository->findAll(); #findUsersAdmin();
+        $page = $request->query->getInt('page', 1);
+        $nbItems = $request->query->getInt('nbItems', 10);
+
+        return $this->paginator->paginate(
+            $data,
+            /* query NOT result */
+            $page,
+            /*page number*/
+            $nbItems, /*limit per page*/
+        );
+    }
+
+    /**
+     * @param Request $request
+     * 
+     * @return array
+     */
+    public function index(Request $request): array
+    {
+        $breadcrumb = $this->breadcrumb();
+        $paginatedUsers = $this->getUsers($request);
+
+        return compact('paginatedUsers', 'breadcrumb');
+    }
+
+    /**
+     * @param Request $request
+     * 
+     * @return array
+     */
+    public function edit(User $user): array
+    {
+        $breadcrumb = $this->breadcrumb([
+            new BreadcrumbItem('Éditer un utilisateur')
+        ]);
+
+        return compact('user', 'breadcrumb');
+    }
+
+    /**
+     * @return User|null
+     */
     private function getUser(): ?User
     {
         $user = $this->security->getUser();
@@ -53,6 +125,11 @@ final class UserService
         return null;
     }
 
+    /**
+     * @param User $user
+     * 
+     * @return User
+     */
     private function hashPassword(User $user): User
     {
         return $user->setPassword($this->passwordHasher->hashPassword($user,  $user->getPassword()));
@@ -64,19 +141,21 @@ final class UserService
      * 
      * @return bool
      */
-    private function save(User $user, bool $boolCreate): bool
+    private function save(User $user, bool $boolCreate = false): bool
     {
         $now = $this->now();
         if ($boolCreate) {
             $user->setRegisteredAt($now)
-                ->setActive(true)
                 ->setIdentifier($user->getEmail())
             ;
             $user = $this->hashPassword($user);
         } else {
             $user->setUpdatedAt($now);
         }
-        
+
+        $username = $user?->getUserIdentifier() ?? 'anonymous';
+        $creator = $this->getUser()?->getUserIdentifier();
+
         try {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
@@ -85,25 +164,20 @@ final class UserService
         } catch (\Throwable $th) {
             $this->generateLog(
                 ['exception' => $th->getMessage()],
-                ['action' => __METHOD__, 'uid' => $user?->getUserIdentifier() ?? 'anonymous'],
+                ['action' => __METHOD__, 'uid' => $creator],
                 LoggerLevelEnum::Error,
             );
-            $result = false;
+
+            return false;
         }
-        
-        if ($boolCreate) {
-            $this->generateLog(
-                ['message' => 'Un nouvel utilisateur à été crée par `' . $user->getUserIdentifier() . '`'],
-                ['action' => __METHOD__, 'uid' => $user?->getUserIdentifier() ?? 'anonymous'],
-                LoggerLevelEnum::Debug,
-            );
-        } else {
-            $this->generateLog(
-                ['message' => 'Un nouvel utilisateur à été crée par `' . $user->getUserIdentifier() . '`'],
-                ['action' => __METHOD__, 'uid' => $user?->getUserIdentifier() ?? 'anonymous'],
-                LoggerLevelEnum::Debug,
-            );
-        }
+
+        $message =  'L\' utilisateur `' . $username . '` a été ' . ($boolCreate ? 'crée' : 'mis à jour') . ' par ' . $creator;
+
+        $this->generateLog(
+            ['message' => $message],
+            ['action' => __METHOD__, 'uid' => $creator ?? 'anonymous'],
+            LoggerLevelEnum::Debug,
+        );
 
         return $result;
     }
@@ -113,7 +187,7 @@ final class UserService
      * 
      * @return Breadcrumb
      */
-    private function breadcrumb(array $items = []): Breadcrumb
+    public function breadcrumb(array $items = []): Breadcrumb
     {
         $breadcrumb = new Breadcrumb([
             new BreadcrumbItem(
@@ -124,6 +198,36 @@ final class UserService
         ]);
 
         return $breadcrumb;
+    }
+
+    /**
+     * @param User $user
+     * 
+     * @return void
+     */
+    public function delete(User $user): void
+    {
+        $creator = $this->getUser()?->getUserIdentifier() ?? 'anonymous';
+
+        try {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+        } catch (\Throwable $th) {
+            $this->generateLog(
+                ['exception' => $th->getMessage()],
+                ['action' => __METHOD__, 'uid' => $creator],
+                LoggerLevelEnum::Error,
+            );
+            return;
+        }
+
+        $message = 'L\'utilisateur `' . $user->getUserIdentifier() . '` a été supprimé par ' . $creator;
+
+        $this->generateLog(
+            ['message' => $message],
+            ['action' => __METHOD__, 'uid' => $creator],
+            LoggerLevelEnum::Debug,
+        );
     }
 
 

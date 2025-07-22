@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Fagathe\Libs\Security\Enum\RoleEnum;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -65,7 +66,7 @@ class CreateAdminUserCommand extends Command
         $user = (new User);
         $user
             ->setEmail($email)
-            ->setRoles(['ROLE_ADMIN'])
+            ->setRoles([(RoleEnum::ROLE_SUPER_ADMIN)->value])
             ->setUsername($username)
             ->setActive(true)
             ->setPassword($password)

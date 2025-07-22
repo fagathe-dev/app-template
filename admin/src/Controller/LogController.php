@@ -22,7 +22,6 @@ final class LogController extends AbstractController
     #[IsGranted('admin.log.view')]
     public function index(Request $request): Response
     {
-        $this->logService->deleteOldFiles();
         // Render the log index page
         return $this->render('@admin/log/index.html.twig', $this->logService->getLogFiles());
     }

@@ -112,7 +112,7 @@ enum RoleEnum: string
         $choices = [];
 
         if ($withExclusion) {
-            $cases = array_filter($cases, fn ($case) => !in_array($case, $excludedCases));
+            $cases = array_filter($cases, fn($case) => !in_array($case, $excludedCases));
         }
 
         foreach ($cases as $case) {
@@ -120,5 +120,22 @@ enum RoleEnum: string
         }
 
         return array_flip(array_unique($choices));
+    }
+
+    /**
+     * @return array
+     */
+    public static function list(): array
+    {
+        $cases = static::cases();
+        $rolesList = [];
+
+        foreach ($cases as $k => $role) {
+            if (!in_array($role, static::EXCLUDED_ROLES)) {
+                array_push($rolesList, $role->value);
+            }
+        }
+
+        return array_unique($rolesList);
     }
 }

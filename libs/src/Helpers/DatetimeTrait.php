@@ -3,6 +3,7 @@
 namespace Fagathe\Libs\Helpers;
 
 use DateTimeImmutable;
+use DateTimeZone;
 
 trait DateTimeTrait
 {
@@ -25,9 +26,9 @@ trait DateTimeTrait
      */
     public function setDateTimeBetween(string $startDate = '-30 years', string $endDate = 'now', ?string $timezone = null): DateTimeImmutable
     {
-        $timezone = $timezone ?? date_default_timezone_get();
-        $start = new DateTimeImmutable($startDate);
-        $end = new DateTimeImmutable($endDate);
+        $timezone = new DateTimeZone($timezone ?? date_default_timezone_get());
+        $start = new DateTimeImmutable($startDate, $timezone);
+        $end = new DateTimeImmutable($endDate, $timezone);
 
         $interval = $end->diff($start);
         $days = 0;

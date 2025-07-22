@@ -12,7 +12,7 @@ class DefaultController extends AbstractController
 
     public function __construct() {}
 
-    #[Route('/auth', name: 'auth')]
+    #[Route('', name: 'auth')]
     public function index(): Response
     {
         return $this->render('@auth/index.html.twig');
