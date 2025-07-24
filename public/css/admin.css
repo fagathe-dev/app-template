@@ -1,0 +1,8 @@
+#user-infos-tab .table-responsive th,
+#user-infos-tab .table-responsive td {
+  padding-block-start: 0;
+  vertical-align: middle;
+}
+#user-infos-tab .table-responsive th {
+  padding-inline-start: 0;
+}

@@ -6,26 +6,32 @@ trait StringTrait
 {
 
     /**
-     * @param string $input
+     * @param string $str
      * 
      * @return string
      */
-    public function sanitizeText(string $input): string
+    public function sanitizeText(string $str): string
     {
-        // Décoder les entités HTML
-        $decoded = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // 1. Translitérer les caractères accentués en leurs équivalents non accentués
+        // iconv('UTF-8', 'ASCII//TRANSLIT', $chaine) tente de convertir la chaîne de l'UTF-8
+        // vers l'ASCII. L'option '//TRANSLIT' est cruciale : elle remplace les caractères
+        // non représentables en ASCII par leur équivalent le plus proche.
+        // L'option '//IGNORE' (ajoutée ici pour plus de robustesse) supprime les caractères
+        // qui ne peuvent pas être translittérés ou qui sont invalides.
+        $chaineSansAccents = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+        dump(__LINE__ . ' ' . $chaineSansAccents);
 
-        // Supprimer les accents
-        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT', $decoded);
+        // 2. Remplacer les caractères qui ne sont ni des lettres (a-z, A-Z), ni des chiffres (0-9),
+        $chaineNettoyee = preg_replace('/[^a-zA-Z0-9\s]/', '', $chaineSansAccents);
 
-        // Supprimer les traits d'union et apostrophes
-        $normalized = preg_replace('/[-\']/u', ' ', $normalized);
+        // 3. Remplacer les multiples espaces par un seul espace (pour nettoyer les doublons créés par le remplacement)
+        $chaineNettoyee = preg_replace('/\s+/', ' ', $chaineNettoyee);
 
-        // Supprimer certains préfixes (l', d', t'y...)
-        $normalized = preg_replace('/\b[lLdDtTyY]\'/', '', $normalized);
+        // 4. Supprimer les espaces en début et fin de chaîne
+        $chaineNettoyee = trim($chaineNettoyee);
 
         // Nettoyer les espaces multiples
-        return preg_replace('/\s+/', ' ', trim($normalized));
+        return $chaineNettoyee;
     }
 
 

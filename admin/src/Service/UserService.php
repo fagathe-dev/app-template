@@ -12,6 +12,7 @@ use Fagathe\Libs\Helpers\DateTimeTrait;
 use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
+use Fagathe\Libs\Security\Enum\RoleEnum;
 use Fagathe\Libs\Utils\UserRequestEnum;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -64,6 +65,16 @@ final class UserService
         );
     }
 
+    public function edit(User $user): array
+    {
+        $breadcrumb = $this->breadcrumb([
+            new BreadcrumbItem('Éditer un utilisateur', $this->urlGenerator->generate('admin_user_edit', ['id' => $user->getId()]))
+        ]);
+        $userRoles = RoleEnum::choices(boolFlip: false);
+
+        return compact('user', 'breadcrumb', 'userRoles');
+    }
+
     /**
      * @param  mixed $request
      * @return PaginationInterface
@@ -95,20 +106,6 @@ final class UserService
         $paginatedUsers = $this->getUsers($request);
 
         return compact('paginatedUsers', 'breadcrumb');
-    }
-
-    /**
-     * @param Request $request
-     * 
-     * @return array
-     */
-    public function edit(User $user): array
-    {
-        $breadcrumb = $this->breadcrumb([
-            new BreadcrumbItem('Éditer un utilisateur')
-        ]);
-
-        return compact('user', 'breadcrumb');
     }
 
     /**

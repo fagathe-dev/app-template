@@ -87,25 +87,7 @@ enum RoleEnum: string
     /**
      * @return array
      */
-    public static function getUserRoles(): array
-    {
-        $cases = static::cases();
-        $excludedCases = static::EXCLUDED_ROLES;
-        $choices = [];
-
-        foreach ($cases as $case) {
-            if (!in_array($case, $excludedCases)) {
-                $choices[] = $case->value;
-            }
-        }
-
-        return array_unique($choices);
-    }
-
-    /**
-     * @return array
-     */
-    public static function choices(bool $withExclusion = true): array
+    public static function choices(bool $withExclusion = true, bool $boolFlip = true): array
     {
         $cases = static::cases();
         $excludedCases = static::EXCLUDED_ROLES;
@@ -119,7 +101,11 @@ enum RoleEnum: string
             $choices[$case->name()] = static::matchLabel($case);
         }
 
-        return array_flip(array_unique($choices));
+        if ($boolFlip) {
+            $choices = array_flip($choices);
+        }
+
+        return array_unique($choices);
     }
 
     /**

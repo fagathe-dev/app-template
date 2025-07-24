@@ -1,0 +1,30 @@
+<div class="tab-pane active" id="user-infos-tab" role="tabpanel">
+  <h2 class="h5 mb-3">Informations personnelles</h2>
+  <div class="table-responsive">
+    <table class="table table-borderless mb-0">
+      <tbody>
+        <tr>
+          <th scope="row">Prénom :</th>
+          <td class="text-muted">{{ user.firstname ?? 'Non renseigné' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Nom de famille :</th>
+          <td class="text-muted">{{ user.lastname ?? 'Non renseigné' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Nom d'utilisateur :</th>
+          <td class="text-muted">{{ user.username }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Adresse e-mail :</th>
+          <td class="text-muted">{{ user.email }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Compte crée le</th>
+          <td class="text-muted">{{ user.registeredAt|date('d F Y') }}</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+</div>
+<!--end tab-pane-->

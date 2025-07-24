@@ -1,6 +1,33 @@
 {% extends "@admin/layout.html.twig" %}
 
 {% block body %}
-  <h1>Modifier l'utilisateur {{ user.userIdentifier }}</h1>
-  {% include "@admin/components/_form.html.twig" %}
+  <h1 class="h3 mb-4">Modifier l'utilisateur <span class="text-primary">{{ user.userIdentifier }}</span></h1>
+  <div class="card mt-xxl-n5">
+    <div class="card-header">
+      <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#user-infos-tab" role="tab">
+            <i class=""></i> Informations personnelles
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#user-permission-tab" role="tab">
+            <i class="r"></i> Permissions et accès
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#user-account-management-tab" role="tab">
+            <i class=""></i> Gestion du compte
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body p-4">
+      <div class="tab-content">
+        {% include "@admin/user/tabs/_user-infos-tab.html.twig" %}
+        {% include "@admin/user/tabs/_user-permission-tab.html.twig" %}
+        {% include "@admin/user/tabs/_user-account-management-tab.html.twig" %}
+      </div>
+    </div>
+  </div>
 {% endblock %}

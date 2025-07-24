@@ -36,7 +36,8 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "sass": "sass --no-source-map --watch public/scss/style.scss public/css/style.css",
+    "build:sass": "sass --no-source-map --watch public/scss/style.scss:public/css-mini/style.css public/scss/admin.scss:public/css-mini/admin.css compressed",
+    "sass": "sass --no-source-map --watch public/scss/style.scss:public/css/style.css public/scss/admin.scss:public/css/admin.css",
     "tsc": "tsc --watch",
     "tsc:compile": "tsc",
     "tsc:build": "tsc && ./build.py",

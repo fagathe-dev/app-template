@@ -1,4 +1,5 @@
 <?php
+
 namespace Fagathe\Libs\Twig;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -11,8 +12,7 @@ class AssetExtension extends AbstractExtension
     public function __construct(
         #[Autowire('%kernel.environment%')]
         private readonly string $env
-    )
-    {
+    ) {
         // Constructor code if needed
     }
 
@@ -23,7 +23,12 @@ class AssetExtension extends AbstractExtension
         ];
     }
 
-    public function appTemplateAsset(string $asset, $type = "css"): string
+    /**
+     * @param string $asset
+     * 
+     * @return string
+     */
+    public function appTemplateAsset(string $asset): string
     {
         if ($this->env === 'dev') {
             return '/' . $asset;
@@ -35,11 +40,11 @@ class AssetExtension extends AbstractExtension
             $fileExtension = explode('.', $fileNameExtension)[1];
             $fileName = explode('.', $fileNameExtension)[0];
             if (str_contains($asset, 'js/')) {
-                $asset = str_replace('js/','js-mini/', $asset);
+                $asset = str_replace('js/', 'js-mini/', $asset);
                 $asset = str_replace($fileNameExtension, $fileName . '.min.' . $fileExtension, $asset);
             }
             if (str_contains($asset, 'css/')) {
-                $asset = str_replace('css/','css-mini/', $asset);
+                $asset = str_replace('css/', 'css-mini/', $asset);
                 $asset = str_replace($fileNameExtension, $fileName . '.min.' . $fileExtension, $asset);
             }
         }
