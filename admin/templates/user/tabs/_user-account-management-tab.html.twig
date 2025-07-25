@@ -1,0 +1,39 @@
+<div class="tab-pane" id="user-account-management-tab" role="tabpanel">
+  <h2 class="h5 mb-3">Gestion du compte</h2>
+  
+  <div class="alert alert-danger">
+    <small class="">
+      Cette section vous permet de gérer le statut d'activation de l'utilisateur. 
+      Un utilisateur <strong>actif</strong> peut se connecter et utiliser l'application, tandis qu'un utilisateur <strong>inactif</strong> ne le peut pas. 
+      Vous avez également la possibilité de <em>supprimer définitivement</em> le compte de l'utilisateur.
+    </small>
+  </div>
+
+  <div class="row mb-4">
+    <h3 class="h6 mb-3">
+      Statut du compte : 
+      <span class="text-{{ user.active ? 'success' : 'danger' }}">{{ user.active ? 'Activé' : 'Désactivé' }}</span>
+    </h3>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-{{ user.active ? 'danger' : 'success' }}" onclick="toggleUserActivation({{ user.id }})">
+        {{ user.active ? 'Désactiver le compte' : 'Activer le compte' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" role="alert">
+    <h4 class="h5 alert-heading">Attention : Suppression Définitive du Compte !</h4>
+    <small>
+      Vous êtes sur le point de supprimer définitivement le compte de cet utilisateur. 
+      Cette action est <strong>irréversible</strong> et entraînera la <em>perte de toutes les données</em> associées à ce compte.
+    </small>
+    <hr>
+    <small class="mb-0 fw-bold">
+      L'utilisateur ne pourra plus se connecter et son historique sera effacé de nos systèmes.
+    </small>
+  </div>
+
+  <button class="btn btn-danger btn-sm" onclick="deleteUserAccount" id="deleteUserAccountBtn">Supprimer le compte</button>
+
+</div>
+<!--end tab-pane-->

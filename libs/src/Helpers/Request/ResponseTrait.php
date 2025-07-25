@@ -36,18 +36,21 @@ trait ResponseTrait
     }
 
     /**
-     * @param ConstraintViolationList $violations
+     * @param array|ConstraintViolationList $violations
      * @param array $headers
      *
      * @return object|null
      */
-    public function sendViolations(ConstraintViolationList $violations, array $headers = []): ?object
+    public function sendViolations(array|ConstraintViolationList $violations, array $headers = []): ?object
     {
+        if ($violations instanceof ConstraintViolationList) {
+            $violations = $this->filterViolations($violations);
+        }
 
         return $this->sendJson(
             [
                 'title' => 'Validation failed !',
-                'violations' => $this->filterViolations($violations),
+                'violations' => $violations,
             ],
             Response::HTTP_BAD_REQUEST,
             $headers

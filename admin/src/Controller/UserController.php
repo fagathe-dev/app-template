@@ -5,9 +5,7 @@ namespace Admin\Controller;
 use Admin\Form\UserType;
 use Admin\Service\UserService;
 use App\Entity\User;
-use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
 use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
-use Fagathe\Libs\Security\Enum\RoleEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +24,7 @@ final class UserController extends AbstractController
     {
         return $this->render('@admin/user/index.html.twig', $this->userService->index($request));
     }
-    
+
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     #[IsGranted('admin.user.create')]
     public function create(Request $request): Response
@@ -48,15 +46,23 @@ final class UserController extends AbstractController
         return $this->render('@admin/user/create.html.twig', compact('form', 'user', 'breadcrumb'));
     }
 
-    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET'], requirements: ['id' => '\d+'])]
     #[IsGranted('admin.user.edit')]
-    public function edit(Request $request, User $user): Response
+    public function editPage(User $user): Response
     {
-        $breadcrumb = $this->userService->breadcrumb([
-            new BreadcrumbItem('Éditer un utilisateur', $this->generateUrl('admin_user_edit', ['id' => $user->getId()]))
-        ]);
+        return $this->render('@admin/user/edit.html.twig', $this->userService->edit($user));
+    }
 
-        return $this->render('@admin/user/edit.html.twig', compact( 'user', 'breadcrumb'));
+    #[Route('/{id}/edit', name: 'edit_action', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[IsGranted('admin.user.edit')]
+    public function editAction(User $user, Request $request): Response
+    {
+        $response = $this->userService->update($request, $user);
+        return $this->json(
+            data: $response->data,
+            status: $response->status,
+            headers: $response->headers
+        );
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'], requirements: ['id' => '\d+'])]

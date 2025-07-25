@@ -9,22 +9,27 @@ use Doctrine\ORM\EntityManagerInterface;
 use Fagathe\Libs\Front\Breadcrumb\Breadcrumb;
 use Fagathe\Libs\Front\Breadcrumb\BreadcrumbItem;
 use Fagathe\Libs\Helpers\DateTimeTrait;
+use Fagathe\Libs\Helpers\Request\ResponseTrait;
 use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
+use Fagathe\Libs\Security\Enum\RoleEnum;
 use Fagathe\Libs\Utils\UserRequestEnum;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class UserService
 {
 
-    use DateTimeTrait;
+    use DateTimeTrait, ResponseTrait;
 
     private const LOG_FILE = 'admin/service/user';
 
@@ -38,6 +43,8 @@ final class UserService
         private readonly EntityManagerInterface $entityManager,
         private readonly PaginatorInterface $paginator,
         private readonly UserRequestService $userRequestService,
+        private readonly SerializerInterface $serializer,
+        private readonly ValidatorInterface $validator,
 
     ) {
         $this->finder = new Finder();
@@ -62,6 +69,170 @@ final class UserService
                 'password' => $password,
             ],
         );
+    }
+
+    /**
+     * @param Request $request
+     * @param User $user
+     * 
+     * @return object
+     */
+    public function update(Request $request, User $user): object
+    {
+        $action = $request->request->get('a');
+        $payload = json_decode($request->getContent(), true);
+
+        if (!$action) {
+            $this->generateLog(
+                ['message' => 'No action specified for user update', 'data' => $payload],
+                ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+                LoggerLevelEnum::Error
+            );
+
+            // If no action is specified, return a bad request response
+            // This is to ensure that the user is aware that an action must be specified
+            return $this->sendViolations(
+                ['message' => 'Aucune action sur l\'utilisateur.'],
+            );
+        }
+
+        try {
+            // Handle the action based on the request
+            // This is a switch-case or match-case structure to handle different actions
+            /**
+             * @var object $response
+             * @throws \Exception
+             */
+            $response = match ($action) {
+                'update-user-infos' => $this->updateUserInfo($request, $user),
+                // 'generate-api-token' => $this->userRequestService->generateApiToken($user),
+                // 'reset-password' => $this->userRequestService->changePassword($request, $user),
+                'change-role' => $this->updateUserRoles($request, $user),
+                // 'toggle-active' => $this->userRequestService->toggleActive($user),
+                default => null,
+            };
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+
+        $this->generateLog(
+            ['message' => 'User updated successfully', 'data' => $payload],
+            ['action' => __METHOD__ . ' ' . $action, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+            LoggerLevelEnum::Debug
+        );
+
+        return $response;
+    }
+
+    private function updateUserRoles(Request $request, User $user): object
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $role = $data['role'] ?? null;
+
+        if ($role !== null) {
+
+            if (is_string($role)) {
+                $role = RoleEnum::tryFrom($role);
+            }
+
+
+            if ($role instanceof RoleEnum && in_array($role, RoleEnum::cases())) {
+                $user->setRoles([$role->value]);
+                $this->save($user);
+
+                $this->generateLog(
+                    content: [
+                        'message' => 'Le role de l\'utilisateur `' . $user->getUserIdentifier() . '` a été mis à jour, nouveau rôle ' . RoleEnum::matchLabel($role),
+                        'data' => compact('user'),
+                    ],
+                    context: ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+                    level: LoggerLevelEnum::Debug
+                );
+
+                return $this->sendJson(
+                    data: [
+                        'message' => 'Le rôle de l\'utilisateur a été mis à jour avec succès.',
+                        'user' => $user,
+                    ],
+                );
+            }
+
+            $this->generateLog(
+                content: [
+                    'message' => 'Le rôle envoyé est invalide pour l\'utilisateur `' . $user->getUserIdentifier() . '`',
+                    'data' => compact('role'),
+                ],
+                context: ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+                level: LoggerLevelEnum::Error
+            );
+            return $this->sendViolations(
+                violations: ['roles' => 'Le rôle envoyé est invalide.']
+            );
+        }
+
+        $this->generateLog(
+            content: [
+                'message' => 'Aucun rôle envoyé pour l\'utilisateur `' . $user->getUserIdentifier() . '`',
+                'data' => compact('role'),
+            ],
+            context: ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+            level: LoggerLevelEnum::Error
+        );
+        return $this->sendViolations(
+            violations: ['roles' => 'Aucun rôle envoyé pour l\'utilisateur `' . $user->getUserIdentifier() . '`',]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param User $user
+     * 
+     * @return object
+     */
+    private function updateUserInfo(Request $request, User $user): object
+    {
+        $data = $request->getContent();
+        $user = $this->serializer->deserialize($data, User::class, 'json', [
+            'object_to_populate' => $user,
+        ]);
+
+        $errors = $this->validator->validate($user);
+
+        if (count($errors) > 0) {
+
+            $this->generateLog(
+                ['exception' => 'Validation errors occurred', 'data' => $this->filterViolations($errors)],
+                ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+                LoggerLevelEnum::Error
+            );
+
+            return $this->sendViolations($errors);
+        }
+
+        $this->save($user);
+
+        return $this->sendJson(
+            data: [
+                'message' => 'L\'utilisateur `' . $user->getUserIdentifier() . '` a été mis à jour avec succès.',
+                'user' => $user,
+            ],
+        );
+    }
+
+    /**
+     * @param User $user
+     * 
+     * @return array
+     */
+    public function edit(User $user): array
+    {
+        $breadcrumb = $this->breadcrumb([
+            new BreadcrumbItem('Éditer un utilisateur', $this->urlGenerator->generate('admin_user_edit', ['id' => $user->getId()]))
+        ]);
+        $userRoles = RoleEnum::choices(boolFlip: false);
+
+        return compact('user', 'breadcrumb', 'userRoles');
     }
 
     /**
@@ -95,20 +266,6 @@ final class UserService
         $paginatedUsers = $this->getUsers($request);
 
         return compact('paginatedUsers', 'breadcrumb');
-    }
-
-    /**
-     * @param Request $request
-     * 
-     * @return array
-     */
-    public function edit(User $user): array
-    {
-        $breadcrumb = $this->breadcrumb([
-            new BreadcrumbItem('Éditer un utilisateur')
-        ]);
-
-        return compact('user', 'breadcrumb');
     }
 
     /**

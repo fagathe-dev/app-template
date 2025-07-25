@@ -1,0 +1,83 @@
+<div class="tab-pane active position-relative" id="user-infos-tab" role="tabpanel">
+  
+  <h2 class="h5 mb-3">Informations personnelles</h2>
+
+  <button 
+    type="button" 
+    class="btn btn-icon btn-ghost-dark rounded-pill waves-effect waves-light shadow-none" 
+    data-bs-toggle="modal"
+    id="editUserBtn"
+    data-bs-target="#editUserInfosModal" 
+    title="Modifier les informations de l'utilisateur"
+  ><i class="ri-pencil-line"></i></button>
+
+  <div class="table-responsive">
+    <table class="table table-borderless mb-0">
+      <tbody>
+        <tr>
+          <th scope="row">Prénom :</th>
+          <td class="text-muted">{{ user.firstname ?? 'Non renseigné' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Nom de famille :</th>
+          <td class="text-muted">{{ user.lastname ?? 'Non renseigné' }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Nom d'utilisateur :</th>
+          <td class="text-muted">{{ user.username }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Adresse e-mail :</th>
+          <td class="text-muted">{{ user.email }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Compte crée le</th>
+          <td class="text-muted">{{ user.registeredAt|date('d F Y') }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<!--end tab-pane-->
+
+<!-- User Edit Informations Modal -->
+<div id="editUserInfosModal" data-backdrop="static" class="modal fade" tabindex="-1" aria-labelledby="editUserInfosModalLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form action="{{ url('admin_user_edit_action', {id: user.id, a: 'update-user-infos'}) }}" method="post" id="editUserInfosForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserInfosModalLabel">Modifier les informations utilisateur</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+        </div>
+        <div class="modal-body">
+          <div id="editUserInfosAlert"></div>
+          <div class="form-group">
+            <label for="firstname">Prénom</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" value="{{ user.firstname }}" >
+          </div>
+
+          <div class="form-group">
+            <label for="lastname">Nom de famille</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" value="{{ user.lastname }}" >
+          </div>
+
+          <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Adresse e-mail</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-primary btn-sm ">Enregistrer</button>
+        </div>
+
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -30,3 +30,7 @@
   flex-flow: column;
   justify-content: end;
 }
+
+.form-group {
+  margin-bottom: 10px;
+}

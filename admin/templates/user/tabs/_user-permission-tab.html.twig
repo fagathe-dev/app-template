@@ -1,0 +1,97 @@
+<div class="tab-pane" id="user-permission-tab" role="tabpanel">
+  <h2 class="h5 mb-3">Permissions et accès</h2>
+  <div class="alert alert-info mb-4">
+    <small class="mb-0">
+      Gérez les <strong>rôles attribués</strong> à l'utilisateur pour contrôler ses privilèges au sein de l'application. 
+      Vous pouvez également envoyer un lien de <em>réinitialisation de mot de passe</em> par e-mail ou modifier son <em>jeton d'API</em> pour les intégrations externes.
+    </small>
+  </div>
+  <div class="row mb-4">
+    <h3 class="h6 mb-3">Changer le rôle</h3>
+    <div class="col-auto">
+      <select name="roles" id="roles" class="form-select" onchange="changeRole(event);">
+        {% for role, label in userRoles %}
+          <option value="{{ role }}" {{ role in user.roles ? 'selected' : '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <!--end change roles section-->
+  <div class="row mb-4">
+    <h3 class="h6 mb-3">Clé d'API</h3>
+    <div class="d-flex flex-row align-items-center">
+      <div class="col-auto">
+
+        <input 
+          type="password" 
+          class="form-control-plaintext {{ user.apiToken != null ?: 'd-none' }}" 
+          name="apiToken" 
+          id="apiToken" 
+          value="{{ user.apiToken }}" 
+          readonly 
+        />
+
+      </div>
+      <div class="col-auto {{ user.apiToken == null ?: 'd-none' }}" id="apiTokenNewActions">
+        
+        <button 
+          type="button" 
+          class="btn btn-primary btn-sm" 
+          onclick="generateApiToken(event, 'apiToken');"
+          title="Générer un nouveau jeton d'API"
+        >Générer un nouveau jeton</button>
+      
+      </div>
+      <div class="col-auto {{ user.apiToken != null ?: 'd-none' }}" id="apiTokenActions">
+        
+        <button 
+          title="Afficher le jeton d'API" 
+          type="button" 
+          class="btn btn-sm btn-icon btn-ghost-dark rounded-pill waves-effect waves-light shadow-none" 
+          onclick="toggleApiToken(event, 'apiToken');"
+        ><i class="ri-eye-line"></i></button>
+        
+        <button 
+          title="Copier le jeton dans le presse-papier" 
+          type="button" 
+          class="btn btn-icon btn-ghost-dark rounded-pill waves-effect waves-light shadow-none" 
+          onclick="copyApiToken(event, 'apiToken');"
+        ><i class="ri-file-copy-line"></i></button>
+        
+        <button
+          title="Envoyer le jeton à l'utilisateur par e-mail" 
+          type="button" 
+          class="btn btn-icon btn-ghost-dark rounded-pill waves-effect waves-light shadow-none" 
+          onclick="sendApiToken(event, 'apiToken');"
+        ><i class="ri-refresh-line"></i></button>
+        
+        <button 
+          title="Générer un nouveau jeton d'API" 
+          type="button" 
+          class="btn btn-icon btn-ghost-dark rounded-pill waves-effect waves-light shadow-none" 
+          onclick="generateApiToken(event, 'apiToken');"
+        ><i class="ri-refresh-line"></i></button>
+      
+      </div>
+    </div>
+  </div>
+  <!--end api token section-->
+  <!-- Reset password section -->
+  <div class="row mb-4">
+    <h3 class="h6 mb-3">Réinitialisation du mot de passe</h3>
+    <div class="col-auto">
+
+      <button 
+        data-href="{{ '' }}" 
+        type="button" 
+        class="btn btn-primary btn-sm" 
+        onclick="resetPassword(event, '{{ user.id }}');"
+        title="Envoyer un lien de réinitialisation de mot de passe"
+      >Envoyer un lien de réinitialisation</button>
+    
+    </div>
+  </div>
+  <!--end reset password section-->
+
+</div>
+<!--end tab-pane-->

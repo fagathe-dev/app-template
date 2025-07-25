@@ -144,7 +144,7 @@ final class LoggerTemplate
         }
 
         if ($this->log->hasContent('data')) {
-            $html .= '<p class="' . $titleClass . '">Data : </p><div class="live-preview"><pre><code class="language-json">' . $this->niceJson($this->log->getContent('data')) . '</code></pre></div>';
+            $html .= '<p class="' . $titleClass . '">Data : </p><div class="live-preview"><pre><code class="language-json">' . $this->niceJson(json: $this->log->getContent('data')) . '</code></pre></div>';
         }
 
         if ($this->log->hasContent('exception')) {
@@ -159,9 +159,9 @@ final class LoggerTemplate
         $this->addHTML($html);
     }
 
-    private function niceJson(string $json): string
+    private function niceJson(string|array $json): string
     {
-        return htmlentities(json_encode($json, JSON_PRETTY_PRINT), ENT_QUOTES, 'UTF-8');
+        return htmlentities(json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8');
     }
 
     /**

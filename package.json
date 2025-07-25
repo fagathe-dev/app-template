@@ -36,12 +36,13 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "sass": "sass --no-source-map --watch public/scss/style.scss public/css/style.css",
+    "build:sass": "sass public/scss/style.scss:public/css-mini/style.min.css public/scss/admin.scss:public/css-mini/admin.min.css --no-source-map --style=compressed",
+    "sass": "sass public/scss/style.scss:public/css/style.css public/scss/admin.scss:public/css/admin.css --watch --no-source-map",
     "tsc": "tsc --watch",
     "tsc:compile": "tsc",
     "tsc:build": "tsc && ./build.py",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node ./scripts/build.js",
+    "build": "node ./scripts/build.js && npm run build:sass",
     "dev": "node ./scripts/watch.js"
   }
 }

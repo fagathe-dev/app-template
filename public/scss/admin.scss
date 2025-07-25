@@ -1,0 +1,21 @@
+#user-infos-tab {
+  #editUserBtn {
+    position: absolute;
+    top: -5px;
+    right: 10px;
+  }
+  .table-responsive {
+    th,
+    td {
+      padding-block-start: 0;
+      vertical-align: middle;
+    }
+    th {
+      padding-inline-start: 0;
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
