@@ -17,7 +17,7 @@ const deleteFeature = async (e: MouseEvent) => {
       });
 
       if (res.ok) {
-        new Alert('La fonctionnalité a été supprimée avec succès 🚀');
+        new Alert('La fonctionnalité a été supprimée avec succès 🚀', 'success');
 
         setTimeout(() => {
           window.scrollTo({
@@ -25,7 +25,7 @@ const deleteFeature = async (e: MouseEvent) => {
             behavior: 'smooth',
           });
           window.location.reload();
-        }, 4000);
+        }, 5000);
       } else {
         console.error('Erreur lors de la suppression de la fonctionnalité.');
         new Alert('Erreur lors de la suppression de la fonctionnalité.', 'danger');
@@ -36,5 +36,3 @@ const deleteFeature = async (e: MouseEvent) => {
     }
   }
 };
-
-const xyz = URLHandler.getAllURLParams();

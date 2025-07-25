@@ -3,7 +3,9 @@
   
   <div class="alert alert-danger">
     <small class="">
-      Cette section vous permet de gérer le statut d'activation de l'utilisateur. Un utilisateur <strong>actif</strong> peut se connecter et utiliser l'application, tandis qu'un utilisateur <strong>inactif</strong> ne le peut pas. Vous avez également la possibilité de <em>supprimer définitivement</em> le compte de l'utilisateur.
+      Cette section vous permet de gérer le statut d'activation de l'utilisateur. 
+      Un utilisateur <strong>actif</strong> peut se connecter et utiliser l'application, tandis qu'un utilisateur <strong>inactif</strong> ne le peut pas. 
+      Vous avez également la possibilité de <em>supprimer définitivement</em> le compte de l'utilisateur.
     </small>
   </div>
 
@@ -16,13 +18,14 @@
       <button class="btn btn-sm btn-{{ user.active ? 'danger' : 'success' }}" onclick="toggleUserActivation({{ user.id }})">
         {{ user.active ? 'Désactiver le compte' : 'Activer le compte' }}
       </button>
-      </div>
+    </div>
   </div>
 
   <div class="alert alert-danger" role="alert">
     <h4 class="h5 alert-heading">Attention : Suppression Définitive du Compte !</h4>
     <small>
-      Vous êtes sur le point de supprimer définitivement le compte de cet utilisateur. Cette action est <strong>irréversible</strong> et entraînera la <em>perte de toutes les données</em> associées à ce compte.
+      Vous êtes sur le point de supprimer définitivement le compte de cet utilisateur. 
+      Cette action est <strong>irréversible</strong> et entraînera la <em>perte de toutes les données</em> associées à ce compte.
     </small>
     <hr>
     <small class="mb-0 fw-bold">

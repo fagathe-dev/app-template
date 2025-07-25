@@ -24,7 +24,7 @@ final class UserController extends AbstractController
     {
         return $this->render('@admin/user/index.html.twig', $this->userService->index($request));
     }
-    
+
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     #[IsGranted('admin.user.create')]
     public function create(Request $request): Response
@@ -48,9 +48,21 @@ final class UserController extends AbstractController
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET'], requirements: ['id' => '\d+'])]
     #[IsGranted('admin.user.edit')]
-    public function edit(User $user): Response
+    public function editPage(User $user): Response
     {
         return $this->render('@admin/user/edit.html.twig', $this->userService->edit($user));
+    }
+
+    #[Route('/{id}/edit', name: 'edit_action', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[IsGranted('admin.user.edit')]
+    public function editAction(User $user, Request $request): Response
+    {
+        $response = $this->userService->update($request, $user);
+        return $this->json(
+            data: $response->data,
+            status: $response->status,
+            headers: $response->headers
+        );
     }
 
     #[Route('/{id}', name: 'delete', methods: ['DELETE'], requirements: ['id' => '\d+'])]

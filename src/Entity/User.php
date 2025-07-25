@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -34,41 +35,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: 'L’email est requis.')]
     #[Assert\Email(message: 'L’email "{{ value }}" n’est pas valide.')]
+    #[Groups('user:read')]
     private ?string $email = null;
-
+    
     /**
      * @var list<string> The user roles
-     */
+    */
     #[ORM\Column]
+    #[Groups('user:read')]
     private array $roles = [];
-
+    
     /**
      * @var string The hashed password
-     */
+    */
     #[ORM\Column]
     private ?string $password = null;
-
+    
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups('user:read')]
     private ?string $firstname = null;
-
+    
     #[ORM\Column(length: 100, nullable: true)]
+    #[Groups('user:read')]
     private ?string $lastname = null;
-
+    
     #[ORM\Column(length: 160, nullable: true)]
+    #[Groups('user:read')]
     private ?string $identifier = null;
-
+    
     #[ORM\Column(length: 160, nullable: true)]
+    #[Groups('user:read')]
     private ?string $api_token = null;
-
+    
     #[ORM\Column]
     private ?\DateTimeImmutable $registered_at = null;
-
+    
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
-
+    
     #[Assert\NotBlank(message: 'Le nom d’utilisateur est requis.')]
     #[Assert\Length(min: 3, max: 100, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
     #[ORM\Column(length: 100)]
+    #[Groups('user:read')]
     private ?string $username = null;
 
     #[ORM\Column(length: 300, nullable: true)]
