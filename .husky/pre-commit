@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate branch name
+node scripts/commit-helper.js validate-branch
+
+# Show git status
+node scripts/commit-helper.js status
+
+# Run lint-staged (formatting and linting)
+npx lint-staged
