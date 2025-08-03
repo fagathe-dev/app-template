@@ -53,11 +53,25 @@ final class UserController extends AbstractController
         return $this->render('@admin/user/edit.html.twig', $this->userService->edit($user));
     }
 
-    #[Route('/{id}/edit', name: 'edit_action', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}/edit', name: 'edit_action', methods: ['PUT'], requirements: ['id' => '\d+'])]
     #[IsGranted('admin.user.edit')]
-    public function editAction(User $user, Request $request): Response
+    public function putAction(User $user, Request $request): Response
     {
         $response = $this->userService->update($request, $user);
+
+        return $this->json(
+            data: $response->data,
+            status: $response->status,
+            headers: $response->headers
+        );
+    }
+
+    #[Route('/{id}/edit', name: 'edit_action', methods: ['PATCH'], requirements: ['id' => '\d+'])]
+    #[IsGranted('admin.user.edit')]
+    public function patchAction(User $user, Request $request): Response
+    {
+        $response = $this->userService->update($request, $user);
+
         return $this->json(
             data: $response->data,
             status: $response->status,

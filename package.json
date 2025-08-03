@@ -49,7 +49,7 @@
     "lint-staged": "lint-staged",
     "commit:status": "node scripts/commit-helper.js status",
     "commit:validate": "node scripts/commit-helper.js validate-branch",
-    "commit:help": "echo 'Commit workflow help:' && echo '1. Create branch: (us|fix|docs|archi)-<issue-number>-<description>' && echo '2. Make changes and add files: git add .' && echo '3. Commit with any message: git commit -m \"your description\"' && echo '4. Message will be auto-formatted to: type(#issue): description'"
+    "commit:help": "node -e \"console.log('Commit workflow help:'); console.log('1. Create branch: (us|fix|docs|archi)-<issue-number>-<description>'); console.log('2. Make changes and add files: git add .'); console.log('3. Commit with any message: git commit -m \\\"your description\\\"'); console.log('4. Message will be auto-formatted to: type(#issue): description')\""
   },
   "lint-staged": {
     "*.{js,ts}": [

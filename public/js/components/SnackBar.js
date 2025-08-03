@@ -3,90 +3,163 @@ var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { en
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
 // public/ts/components/SnackBar.ts
-var SnackBar = class {
-  constructor(message, status = "info", options) {
+var _SnackBar = class _SnackBar {
+  /**
+   * Creates a new SnackBar instance
+   * @param message - The text content to display
+   * @param status - The notification status type
+   * @param options - Configuration options for the snackbar
+   */
+  constructor(message, status = _SnackBar.DEFAULT_STATUS, options = {}) {
+    // DOM elements
+    __publicField(this, "snackBarContainer");
     __publicField(this, "content", null);
-    __publicField(this, "snackBar", null);
-    __publicField(this, "dismissButton", document.createElement("button"));
+    // Configuration
     __publicField(this, "status");
     __publicField(this, "message");
     __publicField(this, "options");
-    __publicField(this, "getStatusMapping", (status) => {
-      const mapping = {
-        success: "success",
-        danger: "danger",
-        warning: "warning",
-        info: "primary",
-        primary: "primary"
-      };
-      return mapping[status];
-    });
     this.message = message;
-    this.status = this.getStatusMapping(status);
-    this.options = options;
-    this.setUpOptions();
+    this.status = this.mapStatus(status);
+    this.options = { ..._SnackBar.DEFAULT_OPTIONS, ...options };
+    this.snackBarContainer = this.getOrCreateContainer();
     this.render();
   }
-  setUpOptions() {
-    const defaultOptions = {
-      duration: 1e4,
-      header: void 0,
-      autoHide: true
-    };
-    this.options = { ...defaultOptions, ...this.options };
+  /**
+   * Maps the input status to the appropriate Bootstrap status
+   */
+  mapStatus(status) {
+    return _SnackBar.STATUS_MAPPING[status] || _SnackBar.DEFAULT_STATUS;
   }
-  getOptions() {
-    return this.options;
-  }
+  /**
+   * Determines the appropriate text color based on the status
+   */
   getTextColor() {
-    let color;
-    switch (this.status) {
-      case "warning":
-        color = "dark";
-        break;
-      default:
-        color = "white";
-        break;
-    }
-    return color;
+    return this.status === "warning" ? "dark" : "white";
   }
-  setUpSnackbar() {
-    this.snackBar = document.body.querySelector(".snackbar");
-    if (this.snackBar === null || this.snackBar === void 0) {
-      this.snackBar = document.createElement("div");
-      this.snackBar.classList.add("snackbar");
+  /**
+   * Gets existing snackbar container or creates a new one
+   */
+  getOrCreateContainer() {
+    let container = document.querySelector(".snackbar");
+    if (!container) {
+      container = this.createContainer();
+      document.body.appendChild(container);
     }
-    document.body.insertAdjacentElement("beforeend", this.snackBar);
+    return container;
   }
-  autoHide() {
-    if (this.options.duration !== void 0) {
-      setTimeout(() => this.content?.remove(), this.options.duration);
-    }
+  /**
+   * Creates a new snackbar container with proper attributes
+   */
+  createContainer() {
+    const container = document.createElement("div");
+    container.className = "snackbar";
+    container.setAttribute("role", "status");
+    container.setAttribute("aria-live", "polite");
+    container.style.position = "fixed";
+    container.style.top = "20px";
+    container.style.right = "20px";
+    container.style.zIndex = "9999";
+    return container;
   }
-  setUpContent() {
+  /**
+   * Creates the snackbar content element
+   */
+  createContent() {
     this.content = document.createElement("div");
-    this.content.classList.add(
+    this.content.className = this.buildContentClasses();
+    this.content.setAttribute("role", "alert");
+    this.content.innerHTML = this.buildContentHTML();
+    this.attachDismissHandler();
+  }
+  /**
+   * Builds the CSS classes for the content element
+   */
+  buildContentClasses() {
+    return [
       "alert",
       "alert-dismissible",
       `bg-${this.status}`,
       `border-${this.status}`,
       `text-${this.getTextColor()}`,
-      "shadow"
-    );
-    this.content.innerHTML = `
-      ${this.message}
+      "shadow",
+      "mb-2"
+    ].join(" ");
+  }
+  /**
+   * Builds the HTML content for the snackbar
+   */
+  buildContentHTML() {
+    const header = this.options.header ? `<strong>${this.escapeHtml(this.options.header)}</strong><br>` : "";
+    const message = this.escapeHtml(this.message);
+    return `
+      ${header}${message}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    this.snackBar?.insertAdjacentElement("afterbegin", this.content);
   }
-  render() {
-    this.setUpSnackbar();
-    this.setUpContent();
-    if (this.options.autoHide) {
-      this.autoHide();
+  /**
+   * Escapes HTML characters to prevent XSS attacks
+   */
+  escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  /**
+   * Attaches the dismiss handler to the close button
+   */
+  attachDismissHandler() {
+    const closeButton = this.content?.querySelector(".btn-close");
+    closeButton?.addEventListener("click", () => this.dismiss());
+  }
+  /**
+   * Sets up auto-hide functionality if enabled
+   */
+  setupAutoHide() {
+    if (this.options.autoHide && this.options.duration > 0) {
+      setTimeout(() => this.dismiss(), this.options.duration);
     }
   }
+  /**
+   * Dismisses the snackbar and removes it from the DOM
+   */
+  dismiss() {
+    if (this.content) {
+      this.content.remove();
+      this.content = null;
+    }
+  }
+  /**
+   * Renders the snackbar to the DOM
+   */
+  render() {
+    this.createContent();
+    if (this.content) {
+      this.snackBarContainer.insertAdjacentElement("afterbegin", this.content);
+      this.setupAutoHide();
+    }
+  }
+  /**
+   * Gets the current options configuration
+   */
+  getOptions() {
+    return { ...this.options };
+  }
 };
+// Constants for default configuration
+__publicField(_SnackBar, "DEFAULT_STATUS", "info");
+__publicField(_SnackBar, "DEFAULT_OPTIONS", {
+  duration: 1e4,
+  header: "",
+  autoHide: true
+});
+__publicField(_SnackBar, "STATUS_MAPPING", {
+  success: "success",
+  danger: "danger",
+  warning: "warning",
+  info: "primary",
+  primary: "primary"
+});
+var SnackBar = _SnackBar;
 export {
   SnackBar
 };

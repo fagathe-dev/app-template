@@ -2,6 +2,7 @@
 
 namespace Admin\Service;
 
+use Admin\Service\UserEmailService;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserRequestService;
@@ -45,6 +46,7 @@ final class UserService
         private readonly UserRequestService $userRequestService,
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
+        private readonly UserEmailService $userEmailService,
 
     ) {
         $this->finder = new Finder();
@@ -149,6 +151,9 @@ final class UserService
                     context: ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
                     level: LoggerLevelEnum::Debug
                 );
+
+                // Envoie d'un email de notification du changement de rôle
+                $this->userEmailService->sendChangeRoleEmail($user);
 
                 return $this->sendJson(
                     data: [

@@ -1,5 +1,5 @@
 import { Alert } from '../components/Alert';
-import { ApiError, fetchAPI } from '../utils/fetch';
+import { ApiError, fetchPUT } from '../utils/fetch';
 import { FormManager } from '../utils/form';
 
 const editForm = new FormManager({
@@ -9,16 +9,10 @@ const editForm = new FormManager({
 const handleEditFormSubmit = async (e: SubmitEvent) => {
   e.preventDefault();
   const data = editForm.getData();
-  const actionUrl = editForm.form.getAttribute('action') as string;
+  const actionUrl = editForm.getForm().getAttribute('action') as string;
 
   try {
-    const response = await fetchAPI(actionUrl, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetchPUT(actionUrl, data);
 
     if (response.ok) {
       // Handle successful user creation, e.g., redirect or show a success message
@@ -51,4 +45,39 @@ const handleEditFormSubmit = async (e: SubmitEvent) => {
   }
 };
 
-editForm.form.addEventListener('submit', (e) => handleEditFormSubmit(e));
+const changeRole = async (e: Event) => {
+  e.preventDefault();
+  const target = e.target as HTMLSelectElement;
+  const url = target.getAttribute('data-action') as string;
+  const role = target.value;
+  const data = { role };
+
+  try {
+    const response = await fetchPUT(url, data);
+
+    if (response.ok) {
+      new Alert('Le rôle a été modifié avec succès 🚀', 'success', {
+        containerId: 'editUserInfosAlert',
+        duration: 5000,
+        dismissible: true,
+      });
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+        window.location.reload();
+      }, 5000);
+    } else {
+      console.error('Erreur lors de la modification du rôle.');
+      new Alert('Erreur lors de la modification du rôle.', 'danger', {
+        containerId: 'user-permission-tab',
+        dismissible: true,
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la modification du rôle : ', error);
+  }
+};
+
+editForm.getForm().addEventListener('submit', (e) => handleEditFormSubmit(e));

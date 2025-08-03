@@ -4,68 +4,157 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
 
 // public/ts/components/Alert.ts
 var _Alert = class _Alert {
+  /**
+   * Creates a new Alert instance
+   * @param message - The text content to display
+   * @param type - The alert status type (info, success, warning, danger)
+   * @param options - Configuration options for the alert
+   */
   constructor(message, type = _Alert.DEFAULT_TYPE, options = {}) {
+    // DOM elements
     __publicField(this, "alertContainer", null);
-    __publicField(this, "options");
     __publicField(this, "alert", null);
     __publicField(this, "closeButton", null);
+    // State management
     __publicField(this, "dismissTimeout", null);
+    __publicField(this, "options");
     __publicField(this, "type");
     __publicField(this, "message");
-    __publicField(this, "dismiss", (e) => {
-      if (e) {
-        e.preventDefault();
-      }
-      if (this.dismissTimeout) {
-        window.clearTimeout(this.dismissTimeout);
-      }
-      this.alert?.remove();
+    /**
+     * Dismisses the alert and cleans up resources
+     */
+    __publicField(this, "dismiss", (event) => {
+      event?.preventDefault();
+      this.clearDismissTimeout();
+      this.removeAlert();
     });
     this.message = message;
     this.type = type;
     this.options = { ..._Alert.DEFAULT_OPTIONS, ...options };
-    this.init();
+    this.initialize();
     this.render();
   }
-  init() {
-    this.alertContainer = document.getElementById(
-      this.options.containerId || _Alert.DEFAULT_CONTAINER_ID
-    );
+  /**
+   * Initializes the alert container and processes options
+   */
+  initialize() {
+    this.setupContainer();
+    this.processDuration();
+  }
+  /**
+   * Sets up or finds the alert container in the DOM
+   */
+  setupContainer() {
+    this.alertContainer = document.getElementById(this.options.containerId);
     if (!this.alertContainer) {
-      this.alertContainer = document.createElement("div");
-      this.alertContainer.id = this.options.containerId || _Alert.DEFAULT_CONTAINER_ID;
+      this.alertContainer = this.createContainer();
       document.body.appendChild(this.alertContainer);
     }
-    if (this.options.duration) {
+  }
+  /**
+   * Creates a new container element for alerts
+   */
+  createContainer() {
+    const container = document.createElement("div");
+    container.id = this.options.containerId;
+    container.setAttribute("role", "status");
+    container.setAttribute("aria-live", "polite");
+    return container;
+  }
+  /**
+   * Converts duration from seconds to milliseconds if needed
+   */
+  processDuration() {
+    if (this.options.duration > 0 && this.options.duration < 100) {
       this.options.duration = this.options.duration * 1e3;
     }
   }
-  setUpAlert() {
-    this.alert = document.createElement("div");
-    this.alert.className = `alert alert-${this.type} alert-borderless shadow fade show${this.options.dismissible ? " alert-dismissible" : ""}`;
-    this.alert.role = "alert";
-    this.alert.innerHTML = `<small>${this.message}</small>`;
-    if (this.options.dismissible) {
-      this.closeButton = document.createElement("button");
-      this.closeButton.className = "btn-close";
-      this.closeButton.setAttribute("data-bs-dismiss", "alert");
-      this.closeButton.setAttribute("aria-label", "Close");
-      this.closeButton.addEventListener("click", this.dismiss);
-      this.alert.insertAdjacentElement("beforeend", this.closeButton);
+  /**
+   * Clears the auto-dismiss timeout if it exists
+   */
+  clearDismissTimeout() {
+    if (this.dismissTimeout) {
+      window.clearTimeout(this.dismissTimeout);
+      this.dismissTimeout = null;
     }
   }
-  render() {
-    this.setUpAlert();
-    this.alertContainer?.insertAdjacentElement("afterbegin", this.alert);
-    if (this.options.duration && this.options.duration > 0) {
+  /**
+   * Removes the alert element from the DOM
+   */
+  removeAlert() {
+    if (this.alert) {
+      this.alert.remove();
+      this.alert = null;
+    }
+  }
+  /**
+   * Creates and configures the alert element
+   */
+  createAlert() {
+    this.alert = document.createElement("div");
+    this.alert.className = this.buildAlertClasses();
+    this.alert.setAttribute("role", "alert");
+    this.alert.innerHTML = `<small>${this.escapeHtml(this.message)}</small>`;
+    if (this.options.dismissible) {
+      this.attachDismissButton();
+    }
+  }
+  /**
+   * Builds the CSS classes for the alert element
+   */
+  buildAlertClasses() {
+    const classes = ["alert", `alert-${this.type}`, "alert-borderless", "shadow", "fade", "show"];
+    if (this.options.dismissible) {
+      classes.push("alert-dismissible");
+    }
+    return classes.join(" ");
+  }
+  /**
+   * Creates and attaches the dismiss button to the alert
+   */
+  attachDismissButton() {
+    this.closeButton = document.createElement("button");
+    this.closeButton.type = "button";
+    this.closeButton.className = "btn-close";
+    this.closeButton.setAttribute("data-bs-dismiss", "alert");
+    this.closeButton.setAttribute("aria-label", "Close");
+    this.closeButton.addEventListener("click", this.dismiss);
+    this.alert?.appendChild(this.closeButton);
+  }
+  /**
+   * Escapes HTML characters to prevent XSS attacks
+   */
+  escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  /**
+   * Sets up auto-dismiss functionality if duration is specified
+   */
+  setupAutoDismiss() {
+    if (this.options.duration > 0) {
       this.dismissTimeout = window.setTimeout(() => this.dismiss(), this.options.duration);
     }
   }
+  /**
+   * Renders the alert to the DOM
+   */
+  render() {
+    this.createAlert();
+    if (this.alert && this.alertContainer) {
+      this.alertContainer.insertAdjacentElement("afterbegin", this.alert);
+      this.setupAutoDismiss();
+    }
+  }
 };
+// Constants for default configuration
 __publicField(_Alert, "DEFAULT_TYPE", "info");
 __publicField(_Alert, "DEFAULT_CONTAINER_ID", "alert-container");
 __publicField(_Alert, "DEFAULT_OPTIONS", {
   containerId: _Alert.DEFAULT_CONTAINER_ID,
+  duration: 0,
+  // 0 means no auto-dismiss
   dismissible: false
 });
 var Alert = _Alert;
@@ -90,11 +179,19 @@ var ApiError = class extends Error {
 };
 var fetchAPI = async (url, options = {}) => {
   try {
+    const requestOptions = { ...options };
+    if (requestOptions.body && typeof requestOptions.body === "object" && !(requestOptions.body instanceof FormData) && !(requestOptions.body instanceof URLSearchParams) && !(requestOptions.body instanceof Blob) && !(requestOptions.body instanceof ArrayBuffer) && typeof requestOptions.body !== "string") {
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      requestOptions.headers = {
+        "Content-Type": "application/json",
+        ...requestOptions.headers
+      };
+    }
     const response = await fetch(url, {
-      ...options,
+      ...requestOptions,
       headers: {
         Accept: "application/json",
-        ...options.headers
+        ...requestOptions.headers
       }
     });
     const clonedResponse = response.clone();
@@ -134,7 +231,6 @@ var fetchAPI = async (url, options = {}) => {
       console.log(error);
       return error;
     }
-    console.log("ICI");
     const errorResponse = new Response(null, { status: 0, statusText: "Network Error" });
     return new ApiError(
       0,
@@ -145,6 +241,42 @@ var fetchAPI = async (url, options = {}) => {
     );
   }
 };
+var fetchGET = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: "GET" });
+};
+var fetchPOST = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "POST"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPUT = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "PUT"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPATCH = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "PATCH"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchDELETE = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: "DELETE" });
+};
 
 // public/ts/admin/features-access-rules.ts
 var deleteFeature = async (e) => {
@@ -153,9 +285,7 @@ var deleteFeature = async (e) => {
   const url = targetElement.tagName !== "A" ? targetElement.closest("a[href]").href : targetElement.href;
   if (confirm("\xCAtes-vous s\xFBr de vouloir supprimer cette fonctionnalit\xE9 ?")) {
     try {
-      const res = await fetchAPI(url, {
-        method: "DELETE"
-      });
+      const res = await fetchDELETE(url);
       if (res.ok) {
         new Alert("La fonctionnalit\xE9 a \xE9t\xE9 supprim\xE9e avec succ\xE8s \u{1F680}", "success");
         setTimeout(() => {

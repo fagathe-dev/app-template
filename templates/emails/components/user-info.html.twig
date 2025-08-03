@@ -1,0 +1,23 @@
+{#
+  Composant d'informations utilisateur pour les emails
+  
+  Paramètres:
+  - title: Titre de la section (requis)
+  - info_items: Array d'items avec 'label' et 'value' (requis)
+  - color: Couleur du texte - défaut: #878a99
+  - center: Boolean pour centrer le texte - défaut: false
+#}
+{% set color = color|default('#878a99') %}
+{% set center = center|default(false) %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+  <td class="content-block" style="font-family: 'Roboto', sans-serif; color: {{ color }}; box-sizing: border-box; font-size: 15px; vertical-align: top; margin: 0; padding: 0 0 26px;{% if center %} text-align: center;{% endif %}" valign="top">
+    {{ title }}
+    <p style="margin-bottom: 8px;">
+      {% for item in info_items %}
+        <strong>{{ item.label }} :</strong> {{ item.value }}
+        {% if not loop.last %}<br>{% endif %}
+      {% endfor %}
+    </p>
+  </td>
+</tr>

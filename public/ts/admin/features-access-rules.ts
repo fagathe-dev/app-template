@@ -1,6 +1,5 @@
 import { Alert } from '../components/Alert';
-import { fetchAPI } from '../utils/fetch';
-import { URLHandler } from '../utils/url';
+import { fetchDELETE } from '../utils/fetch';
 
 const deleteFeature = async (e: MouseEvent) => {
   e.preventDefault();
@@ -12,9 +11,7 @@ const deleteFeature = async (e: MouseEvent) => {
 
   if (confirm('Êtes-vous sûr de vouloir supprimer cette fonctionnalité ?')) {
     try {
-      const res = await fetchAPI(url, {
-        method: 'DELETE',
-      });
+      const res = await fetchDELETE(url);
 
       if (res.ok) {
         new Alert('La fonctionnalité a été supprimée avec succès 🚀', 'success');

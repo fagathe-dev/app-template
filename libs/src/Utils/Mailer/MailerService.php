@@ -70,37 +70,63 @@ final class MailerService
     ): void {
 
         try {
+            $template = $this->normalizeTemplate($template);
 
-            if (str_starts_with(static::DEFAULT_EMAIL_TEMPLATES_DIR, $template)) {
-                $template = str_replace(static::DEFAULT_EMAIL_TEMPLATES_DIR, '', $template);
-            }
-            if (str_ends_with('.html.twig', $template)) {
-                $template = str_replace('.html.twig', '', $template);
-            }
-            $email = (new TemplatedEmail);
-            $email->from($this->getSender($sender));
+            $email = (new TemplatedEmail())
+                ->from($this->getSender($sender))
+                ->subject($subject)
+                ->htmlTemplate($template);
+
             $email = $this->setRecepient($email, $recepient);
+
             if (!empty($cc)) {
                 $email = $this->setRecepient($email, $cc, RecepientEnum::Cc);
             }
+
             if (!empty($bcc)) {
                 $email = $this->setRecepient($email, $bcc, RecepientEnum::Bcc);
             }
-            $email->subject($subject);
-            $email->htmlTemplate($template);
+
             $email = $this->setContext($email, $context);
             $email = $this->setAttachments($email, $attachments);
             $email->embed(fopen(ROOT_DIR . 'public/images/logo-light.png', 'r'), 'logo_cid');
 
             $this->mailer->send($email);
+
+            $this->generateLog(
+                content: ['message' => 'Email sent successfully', 'subject' => $subject, 'recipients' => count($recepient)],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
         } catch (Exception $e) {
             $this->generateLog(
-                content: ['exception' => $e->getMessage()],
+                content: ['exception' => $e->getMessage(), 'subject' => $subject],
                 context: ['action' => __METHOD__],
                 level: LoggerLevelEnum::Error
             );
-            throw new \RuntimeException('Failed to send email: ' . $e->getMessage());
+            throw new \RuntimeException('Failed to send email: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Normalizes the template path by removing common prefixes and suffixes.
+     *
+     * @param string $template
+     * @return string
+     */
+    private function normalizeTemplate(string $template): string
+    {
+        // Remove the default email templates directory prefix if present
+        if (str_starts_with($template, static::DEFAULT_EMAIL_TEMPLATES_DIR)) {
+            $template = substr($template, strlen(static::DEFAULT_EMAIL_TEMPLATES_DIR));
+        }
+
+        // Remove the .html.twig suffix if present
+        if (str_ends_with($template, '.html.twig')) {
+            $template = substr($template, 0, -10); // Remove '.html.twig' (10 characters)
+        }
+
+        return $template;
     }
 
     /**
@@ -120,28 +146,40 @@ final class MailerService
      */
     private function setAttachments(TemplatedEmail $email, ?array $attachments): TemplatedEmail
     {
-        $filesystem = new Filesystem;
-
-        if (!is_null($attachments)) {
-            foreach ($attachments as $key => $attachment) {
-                $file_path = $attachment['path'] ?? null;
-                if ($filesystem->exists($file_path)) {
-                    $file_name = $attachment['name'] ?? basename($file_path);
-                    $file_mime_type = MimeType::guessMimetype($file_path);
-
-                    $dataPart = new DataPart(new File($file_path), $file_name, $file_mime_type);
-                    $email->addPart($dataPart);
-                } else {
-                    $this->generateLog(
-                        content: ['exception' => 'Attachment file does not exist: ' . $file_path],
-                        context: ['action' => __METHOD__],
-                        level: LoggerLevelEnum::Error
-                    );
-                    throw new \RuntimeException('Attachment file does not exist: ' . $file_path);
-                }
-            }
+        if (empty($attachments)) {
+            return $email;
         }
 
+        $filesystem = new Filesystem();
+
+        foreach ($attachments as $attachment) {
+            $filePath = $attachment['path'] ?? null;
+
+            if (empty($filePath)) {
+                $this->generateLog(
+                    content: ['exception' => 'Attachment path is missing'],
+                    context: ['action' => __METHOD__],
+                    level: LoggerLevelEnum::Warning
+                );
+                continue;
+            }
+
+            if (!$filesystem->exists($filePath)) {
+                $errorMsg = "Attachment file does not exist: {$filePath}";
+                $this->generateLog(
+                    content: ['exception' => $errorMsg],
+                    context: ['action' => __METHOD__],
+                    level: LoggerLevelEnum::Error
+                );
+                throw new \RuntimeException($errorMsg);
+            }
+
+            $fileName = $attachment['name'] ?? basename($filePath);
+            $mimeType = MimeType::guessMimetype($filePath);
+
+            $dataPart = new DataPart(new File($filePath), $fileName, $mimeType);
+            $email->addPart($dataPart);
+        }
 
         return $email;
     }
@@ -161,20 +199,43 @@ final class MailerService
      */
     private function setContext(TemplatedEmail $email, array $context = []): TemplatedEmail
     {
-        $origin = $this->getOrigin();
-        $logo_path = ROOT_DIR . 'public/images/logo-light.png'; // Default logo URL
-        $type = pathinfo($logo_path, PATHINFO_EXTENSION);
-        $data = file_get_contents($logo_path);
+        $logoPath = ROOT_DIR . 'public/images/logo-light.png';
+
+        if (!file_exists($logoPath)) {
+            $this->generateLog(
+                content: ['warning' => 'Logo file not found: ' . $logoPath],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Warning
+            );
+        }
+
         $presetContext = [
             'app_name' => APP_NAME,
-            'base_url' => $origin,
-            'logo' => 'data:image/' . $type . ';base64,' . base64_encode($data),
+            'base_url' => $this->getOrigin(),
+            'logo' => $this->generateBase64Logo($logoPath),
         ];
 
-        $context = array_merge($presetContext, $context);
-        $email->context($context);
+        $email->context(array_merge($presetContext, $context));
 
         return $email;
+    }
+
+    /**
+     * Generates a base64 encoded logo for email templates.
+     *
+     * @param string $logoPath
+     * @return string
+     */
+    private function generateBase64Logo(string $logoPath): string
+    {
+        if (!file_exists($logoPath)) {
+            return '';
+        }
+
+        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+        $data = file_get_contents($logoPath);
+
+        return 'data:image/' . $type . ';base64,' . base64_encode($data);
     }
 
 
@@ -192,31 +253,32 @@ final class MailerService
      */
     private function getSender(array|string|null $sender = null): Address|string
     {
-        if (is_null($sender)) {
+        if ($sender === null) {
             $sender = APP_EMAIL_CONTACT;
         }
 
-        if (is_array($sender)) {
-            $key = array_keys($sender)[0];
-            $value = array_values($sender)[0];
+        if (is_string($sender)) {
+            return $sender;
+        }
 
-            if (Validator::isValidEmail($key)) {
-                $sender = new Address($key, $value);
-            } elseif (Validator::isValidEmail($value)) {
-                $sender = new Address($value, $key);
+        if (is_array($sender) && !empty($sender)) {
+            $email = array_keys($sender)[0];
+            $name = array_values($sender)[0];
+
+            if (Validator::isValidEmail($email)) {
+                return new Address($email, $name);
+            } elseif (Validator::isValidEmail($name)) {
+                return new Address($name, $email);
             }
         }
 
-        if (!is_string($sender) && !is_array($sender) && !$sender instanceof Address) {
-            $this->generateLog(
-                content: ['exception' => 'Invalid sender format. Expected array or string.'],
-                context: ['action' => __METHOD__],
-                level: LoggerLevelEnum::Error
-            );
-            throw new \InvalidArgumentException('Invalid sender format. Expected array or string.');
-        }
+        $this->generateLog(
+            content: ['exception' => 'Invalid sender format', 'sender' => $sender],
+            context: ['action' => __METHOD__],
+            level: LoggerLevelEnum::Error
+        );
 
-        return $sender;
+        throw new \InvalidArgumentException('Invalid sender format. Expected valid email address.');
     }
 
     /**
@@ -232,9 +294,9 @@ final class MailerService
      * $recepient = ['John Doe' => 'john.doe@example.com'];
      * $updatedEmail = $this->setRecepient($email, $recepient, RecepientEnum::Cc);
      */
-    private function setRecepient(TemplatedEmail $email, array $recepient, RecepientEnum $type = RecepientEnum::To): TemplatedEmail
+    private function setRecepient(TemplatedEmail $email, array $recipient, RecepientEnum $type = RecepientEnum::To): TemplatedEmail
     {
-        if (empty($recepient)) {
+        if (empty($recipient)) {
             $this->generateLog(
                 content: ['exception' => 'Recipient list is empty.'],
                 context: ['action' => __METHOD__],
@@ -243,90 +305,85 @@ final class MailerService
             throw new \InvalidArgumentException('Recipient list cannot be empty.');
         }
 
-        $addresses = [];
-
-        foreach ($recepient as $key => $value) {
-            $eMail = [];
-
-            if (is_int($key)) {
-                dd($key, $value);
-                if (Validator::isValidEmail($value)) {
-                    $eMail = ['address' => $value];
-                } else {
-                    $this->generateLog(
-                        content: ['exception' => 'Invalid email address: ' . $value],
-                        context: ['action' => __METHOD__],
-                        level: LoggerLevelEnum::Error
-                    );
-                    throw new \InvalidArgumentException('Invalid email address: ' . $value);
-                }
-                array_push($addresses, $eMail);
-            }
-
-            if (is_string($key) || is_string($value)) {
-                // If the key is a valid email address, use it as the address
-                if (Validator::isValidEmail($key)) {
-                    $eMail = ['address' => $key, 'name' => $value];
-                    // If the value is a valid email address, use it as the address
-                } elseif (Validator::isValidEmail($value)) {
-                    $eMail = ['address' => $value, 'name' => $key];
-                } else {
-                    $this->generateLog(
-                        content: ['exception' => 'Invalid email address: ' . Validator::isValidEmail($key) ? $key : $value],
-                        context: ['action' => __METHOD__],
-                        level: LoggerLevelEnum::Error
-                    );
-                    throw new \InvalidArgumentException('Invalid email address: ' . $key);
-                }
-                array_push($addresses, $eMail);
-            }
-        }
-
-        foreach ($addresses as $key => $address) {
-            $keys = array_keys($address);
-            $recepient = null;
-
-            if (in_array('name', $keys)) {
-                $recepient = new Address($address['address'], $address['name']);
-            } else {
-                $recepient = $address['address'];
-            }
-
-            if ($key === 0) {
-                if ($type === RecepientEnum::To) {
-                    $email->to($recepient);
-                } elseif ($type === RecepientEnum::Cc) {
-                    $email->cc($recepient);
-                } elseif ($type === RecepientEnum::Bcc) {
-                    $email->bcc($recepient);
-                } else {
-                    $this->generateLog(
-                        content: ['exception' => 'Invalid recipient type: ' . $type],
-                        context: ['action' => __METHOD__],
-                        level: LoggerLevelEnum::Error
-                    );
-                    throw new \InvalidArgumentException('Invalid recipient type: ' . $type);
-                }
-            } else {
-                if ($type === RecepientEnum::To) {
-                    $email->addTo($recepient);
-                } elseif ($type === RecepientEnum::Cc) {
-                    $email->addCc($recepient);
-                } elseif ($type === RecepientEnum::Bcc) {
-                    $email->addBcc($recepient);
-                } else {
-                    $this->generateLog(
-                        content: ['exception' => 'Invalid recipient type: ' . $type],
-                        context: ['action' => __METHOD__],
-                        level: LoggerLevelEnum::Error
-                    );
-                    throw new \InvalidArgumentException('Invalid recipient type: ' . $type);
-                }
-            }
-            $email->addTo($recepient);
-        }
+        $addresses = $this->parseRecipients($recipient);
+        $this->addRecipientsToEmail($email, $addresses, $type);
 
         return $email;
+    }
+
+    /**
+     * Parses recipient array and returns normalized address array.
+     *
+     * @param array $recipients
+     * @return array
+     */
+    private function parseRecipients(array $recipients): array
+    {
+        $addresses = [];
+
+        foreach ($recipients as $key => $value) {
+            if (is_int($key)) {
+                // Simple email: ['email@example.com']
+                if (Validator::isValidEmail($value)) {
+                    $addresses[] = ['address' => $value];
+                } else {
+                    $this->logInvalidEmail($value);
+                }
+            } elseif (is_string($key) || is_string($value)) {
+                // Named email: ['email@example.com' => 'Name'] or ['Name' => 'email@example.com']
+                if (Validator::isValidEmail($key)) {
+                    $addresses[] = ['address' => $key, 'name' => $value];
+                } elseif (Validator::isValidEmail($value)) {
+                    $addresses[] = ['address' => $value, 'name' => $key];
+                } else {
+                    $this->logInvalidEmail($key ?: $value);
+                }
+            }
+        }
+
+        return $addresses;
+    }
+
+    /**
+     * Adds recipients to email based on type.
+     *
+     * @param TemplatedEmail $email
+     * @param array $addresses
+     * @param RecepientEnum $type
+     * @return void
+     */
+    private function addRecipientsToEmail(TemplatedEmail $email, array $addresses, RecepientEnum $type): void
+    {
+        foreach ($addresses as $index => $address) {
+            $recipient = isset($address['name'])
+                ? new Address($address['address'], $address['name'])
+                : $address['address'];
+
+            $isFirst = $index === 0;
+
+            match ($type) {
+                RecepientEnum::To => $isFirst ? $email->to($recipient) : $email->addTo($recipient),
+                RecepientEnum::Cc => $isFirst ? $email->cc($recipient) : $email->addCc($recipient),
+                RecepientEnum::Bcc => $isFirst ? $email->bcc($recipient) : $email->addBcc($recipient),
+                default => throw new \InvalidArgumentException('Invalid recipient type: ' . $type->value)
+            };
+        }
+    }
+
+    /**
+     * Logs invalid email error.
+     *
+     * @param string $email
+     * @return void
+     */
+    private function logInvalidEmail(string $email): void
+    {
+        $this->generateLog(
+            content: ['exception' => 'Invalid email address: ' . $email],
+            context: ['action' => __METHOD__],
+            level: LoggerLevelEnum::Error
+        );
+        throw new \InvalidArgumentException('Invalid email address: ' . $email);
     }
 
     /**

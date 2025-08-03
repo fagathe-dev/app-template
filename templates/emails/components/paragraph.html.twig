@@ -1,0 +1,20 @@
+{#
+  Composant de paragraphe pour les emails
+  
+  Paramètres:
+  - content: Le contenu du paragraphe (peut être du HTML) (requis)
+  - color: Couleur du texte - défaut: #878a99
+  - center: Boolean pour centrer le texte - défaut: false
+  - margin_bottom: Marge en bas - défaut: 26px
+  - font_size: Taille de police - défaut: 15px
+#}
+{% set color = color|default('#878a99') %}
+{% set center = center|default(false) %}
+{% set margin_bottom = margin_bottom|default('26px') %}
+{% set font_size = font_size|default('15px') %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+  <td class="content-block" style="font-family: 'Roboto', sans-serif; color: {{ color }}; box-sizing: border-box; font-size: {{ font_size }}; vertical-align: top; margin: 0; padding: 0 0 {{ margin_bottom }};{% if center %} text-align: center;{% endif %}" valign="top">
+    {{ content|raw }}
+  </td>
+</tr>

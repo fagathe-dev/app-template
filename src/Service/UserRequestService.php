@@ -15,7 +15,6 @@ use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Log;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
-use Fagathe\Libs\Utils\Mailer\Email;
 use Fagathe\Libs\Utils\Mailer\MailerService;
 use Fagathe\Libs\Utils\UserRequestEnum;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -108,30 +107,38 @@ final class UserRequestService
         $user = $userRequest->getUser();
         $token = $userRequest->getToken();
 
-        $email = new Email(
-            name: UserRequestEnum::ACCOUNT_ACTIVATION_REQUEST->value,
-            action: 'Vérification de compte',
-            template: 'auth/verify-account',
-            context: [
-                'user' => [
-                    'name' => $user->getUsername(),
-                    'email' => $user->getEmail(),
-                    'username' => $user->getUsername(),
-                ],
-                'activation_link' => $this->urlGenerator->generate(
-                    'auth_request_verification_verify',
-                    compact('token'),
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ]
-        );
+        try {
+            $this->mailer->sendEmail(
+                recepient: [$user->getUsername() => $user->getEmail()],
+                subject: 'Vérification de votre compte ' . APP_NAME,
+                template: 'auth/verify-account',
+                context: [
+                    'user' => [
+                        'name' => $user->getUsername(),
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                    ],
+                    'activation_link' => $this->urlGenerator->generate(
+                        'auth_request_verification_verify',
+                        compact('token'),
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                ]
+            );
 
-        $this->mailer->sendEmail(
-            recepient: [$user->getUsername() => $user->getEmail()],
-            subject: 'Vérification de votre compte ' . APP_NAME,
-            template: $email->getTemplate(),
-            context: $email->getContext()
-        );
+            $this->generateLog(
+                content: ['message' => 'Account activation email sent', 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
+        } catch (\Exception $e) {
+            $this->generateLog(
+                content: ['exception' => $e->getMessage(), 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Error
+            );
+            throw $e;
+        }
     }
 
     /**
@@ -142,37 +149,41 @@ final class UserRequestService
      */
     private function sendUserCreationAdminEmail(UserRequest $userRequest, array $data): void
     {
-        $subject = 'Création de votre compte ' . APP_NAME;
-        $template = 'auth/admin/create-account';
         $user = $userRequest->getUser();
 
+        try {
+            $this->mailer->sendEmail(
+                recepient: [$user->getUsername() => $user->getEmail()],
+                subject: 'Création de votre compte ' . APP_NAME,
+                template: 'admin/user/create-account',
+                context: [
+                    'user' => [
+                        'name' => $user->getUsername(),
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                        'password' => $data['password'] ?? 'N/A',
+                    ],
+                    'activation_link' => $this->urlGenerator->generate(
+                        'auth_request_verification_verify',
+                        ['token' => $userRequest->getToken()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                ]
+            );
 
-        $email = new Email(
-            name: UserRequestEnum::ACCOUNT_ADMIN_CREATION_REQUEST->value,
-            action: $subject,
-            template: $template,
-            context: [
-                'user' => [
-                    'name' => $user->getUsername(),
-                    'email' => $user->getEmail(),
-                    'username' => $user->getUsername(),
-                    'password' => $data['password'] ?? 'N/A',
-                ],
-                'activation_link' => $this->urlGenerator->generate(
-                    'auth_request_verification_verify',
-                    ['token' => $userRequest->getToken()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ],
-        );
-
-        // Send the email to the user
-        $this->mailer->sendEmail(
-            recepient: [$user->getUsername() => $user->getEmail()],
-            subject: 'Vérification de votre compte ' . APP_NAME,
-            template: $email->getTemplate(),
-            context: $email->getContext()
-        );
+            $this->generateLog(
+                content: ['message' => 'Admin creation email sent', 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
+        } catch (\Exception $e) {
+            $this->generateLog(
+                content: ['exception' => $e->getMessage(), 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Error
+            );
+            throw $e;
+        }
     }
 
     /**
@@ -255,31 +266,31 @@ final class UserRequestService
                     level: LoggerLevelEnum::Info
                 );
                 $this->addFlash('danger', 'Aucun utilisateur associé à cette demande d\'activation.');
-                
+
                 return false;
             }
-            
+
             if ($this->isDatePast($userRequest->getExpiredAt())) {
                 $this->generateLog(
                     content: ['message' => 'La demande d\'activation a expiré.'],
                     context: ['action' => __METHOD__],
                     level: LoggerLevelEnum::Info
                 );
-                
+
                 $link = $this->urlGenerator->generate(
                     'auth_verification_index',
                 );
-                
+
                 $this->addFlash('warning', 'La demande d\'activation a expiré. Veuillez en faire une nouvelle en <a href="' . $link . '">cliquant ici</a>.');
-                
+
                 return false;
             }
-            
+
             match ($userRequest->getType()) {
                 UserRequestEnum::ACCOUNT_ACTIVATION_REQUEST->value, UserRequestEnum::ACCOUNT_ADMIN_CREATION_REQUEST->value => $this->userService->activate($userRequest),
                 default => false,
             };
-            
+
             $this->closeUserRequest($userRequest);
 
             return true;

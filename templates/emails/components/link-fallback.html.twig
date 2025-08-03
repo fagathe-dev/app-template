@@ -1,0 +1,19 @@
+{#
+  Composant de lien de fallback pour les emails
+  
+  Paramètres:
+  - url: L'URL du lien (requis)
+  - message: Message d'explication - défaut: "Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :"
+  - color: Couleur du texte - défaut: #878a99
+  - center: Boolean pour centrer le texte - défaut: true
+#}
+{% set message = message|default("Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :") %}
+{% set color = color|default('#878a99') %}
+{% set center = center|default(true) %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+  <td class="content-block" style="color: {{ color }};{% if center %} text-align: center;{% endif %}font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0; padding-top: 5px" valign="top">
+    <p style="margin-bottom: 10px;">{{ message }}</p>
+    <small>{{ url }}</small>
+  </td>
+</tr>

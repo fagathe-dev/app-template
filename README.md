@@ -1,95 +1,88 @@
 # App Template
 
-## Development Guidelines
+## 🚀 Aperçu du Projet
 
-### Git Workflow
+Application web moderne basée sur Symfony 7.2 et TypeScript 5.8, offrant une architecture robuste et scalable pour le développement d'applications d'entreprise.
 
-#### Branch Naming Convention
+Ce template fournit une base solide pour développer des applications web modernes avec :
 
-Branches should follow this naming pattern:
+- **Backend** : Symfony 7.2 avec architecture modulaire (bundles personnalisés)
+- **Frontend** : TypeScript 5.8 compilé avec esbuild et Webpack Encore
+- **Base de données** : MySQL 8.0+ avec Doctrine ORM
+- **Styling** : SCSS avec support RTL et design responsive
+- **Qualité** : Tests automatisés, hooks Git, et outils de linting
+- **Sécurité** : JWT, authentification robuste, protection RGPD
 
-```
-(us|archi|fix|docs)-numero_issue-description
-```
+## ⚡ Prérequis
 
-Examples:
+- PHP 8.2+
+- Node.js 18+
+- MySQL 8.0+
+- Composer 2.x
 
-- `us-123-add-user-authentication`
-- `fix-456-fix-login-error`
-- `docs-789-update-readme`
-- `archi-101-setup-docker`
+## 📚 Documentation
 
-#### Commit Messages
+Cette section fournit des liens vers toute la documentation technique du projet.
 
-We use conventional commits with automatic formatting based on branch names. The format is:
+### Documentation Générale
 
-```
-type(#issue): description
-```
+- **[Vue d'ensemble du projet](docs/README.md)** - Introduction complète au projet
+- **[Installation et Configuration](docs/installation_and_setup.md)** - Guide d'installation détaillé
+- **[Commandes Disponibles](docs/commands.md)** - Liste complète des commandes Symfony
+- **[Workflow de Développement](docs/development_workflow.md)** - Processus de développement et bonnes pratiques
 
-Types are automatically mapped from branch prefixes:
+### 🏗️ Architecture
 
-- `us-` → `feat`
-- `fix-` → `fix`
-- `docs-` → `docs`
-- `archi-` → `chore`
+- **[Vue d'ensemble de l'Architecture](docs/architecture/overview.md)** - Architecture générale du système
+- **[Structure Backend](docs/architecture/backend_structure.md)** - Organisation du code Symfony
+- **[Structure Frontend](docs/architecture/frontend_structure.md)** - Organisation du code TypeScript
+- **[Flux de Données](docs/architecture/data_flow.md)** - Communication entre les composants
+- **[Technologies Utilisées](docs/architecture/technologies.md)** - Stack technique détaillée
 
-Examples:
+### 📦 Modules Métier
 
-```
-feat(#123): add user authentication system
-fix(#456): resolve login page redirect issue
-docs(#789): update API documentation
-chore(#101): configure CI/CD pipeline
-```
+- **[Gestion des Utilisateurs](docs/modules/UserManagement.md)** - Module de gestion des utilisateurs
+- **[Administration](docs/modules/Administration.md)** - Interface d'administration
+- **[Authentification](docs/modules/Authentication.md)** - Système d'authentification
+- **[SEO](docs/modules/SEO.md)** - Optimisation pour les moteurs de recherche
+- **[Tracking](docs/modules/Tracking.md)** - Suivi et analytics
+- **[Gestion des Demandes](docs/modules/RequestManagement.md)** - Workflow des demandes
 
-### Code Quality Tools
+### 🔌 API et Intégrations
 
-The project uses several tools to ensure code quality:
+- **[API REST Interne](docs/api/internal_rest.md)** - Documentation complète de l'API
+- **[Intégrations Externes](docs/api/external_integrations.md)** - Services tiers et webhooks
 
-#### Husky
+### 🗄️ Base de Données
 
-Pre-commit hooks are configured to run:
+- **[Schéma de Base de Données](docs/database/schema.md)** - Structure et relations
+- **[Migrations](docs/database/migrations.md)** - Gestion des migrations Doctrine
 
-- Prettier for code formatting
-- ESLint for code quality
-- Commitlint for commit message validation
+### 🔐 Sécurité
 
-#### Lint-staged
+- **[Authentification](docs/security/authentication.md)** - JWT, sessions et sécurité
+- **[Autorisation](docs/security/authorization.md)** - Rôles, permissions et voters
+- **[Protection des Données](docs/security/data_protection.md)** - RGPD et confidentialité
 
-Automatically runs linters on staged files:
+### 🎨 Frontend
 
-- JavaScript/TypeScript files: Prettier + ESLint
-- JSON/Markdown files: Prettier
+- **[Architecture Frontend](docs/frontend/architecture.md)** - Structure TypeScript et SCSS
+- **[Composants UI](docs/frontend/components.md)** - Bibliothèque de composants réutilisables
+- **[Gestion d'État](docs/frontend/state_management.md)** - State management et communication
 
-### Getting Started
+### 🧪 Tests
 
-1. Install dependencies:
+- **[Stratégie de Test](docs/testing/strategy.md)** - Approche globale des tests
+- **[Tests Unitaires](docs/testing/unit_tests.md)** - Tests PHPUnit et Jest
+- **[Tests d'Intégration](docs/testing/integration_tests.md)** - Tests API et inter-modules
+- **[Tests de Performance](docs/testing/performance_tests.md)** - Tests de charge et optimisation
 
-```bash
-npm install
-```
+### 🚀 Liens Rapides
 
-2. The following tools will be automatically set up:
+Pour commencer rapidement :
 
-- Husky git hooks
-- Lint-staged configuration
-- Commitlint rules
-
-3. Start developing:
-
-```bash
-npm run dev
-```
-
-### Available Scripts
-
-- `npm run build:sass`: Build and minify SASS files
-- `npm run sass`: Watch SASS files for changes
-- `npm run tsc`: Watch TypeScript files
-- `npm run tsc:compile`: Compile TypeScript files
-- `npm run tsc:build`: Build TypeScript files
-- `npm run build`: Build the project
-- `npm run dev`: Start development server
-- `npm run lint`: Run ESLint
-- `npm run format`: Run Prettier
+1. **Nouveau développeur** → [Installation et Configuration](docs/installation_and_setup.md)
+2. **Architecture du projet** → [Vue d'ensemble](docs/architecture/overview.md)
+3. **API Documentation** → [API REST](docs/api/internal_rest.md)
+4. **Base de données** → [Schéma](docs/database/schema.md)
+5. **Tests** → [Stratégie de test](docs/testing/strategy.md)

@@ -9,7 +9,7 @@
   <div class="row mb-4">
     <h3 class="h6 mb-3">Changer le rôle</h3>
     <div class="col-auto">
-      <select name="roles" id="roles" class="form-select" onchange="changeRole(event);">
+      <select data-action="{{ path('admin_user_edit_action', { id: user.id, a: 'change-role' }) }}" name="roles" id="roles" class="form-select" onchange="changeRole(event);">
         {% for role, label in userRoles %}
           <option value="{{ role }}" {{ role in user.roles ? 'selected' : '' }}>{{ label }}</option>
         {% endfor %}
