@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Use the Node.js commit helper to process the commit message
 node scripts/commit-helper.js process-message "$1"
 
