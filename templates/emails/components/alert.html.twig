@@ -1,0 +1,32 @@
+{#
+  Composant d'alerte/notification pour les emails
+  
+  Paramètres:
+  - content: Le contenu de l'alerte (requis)
+  - type: Type d'alerte (success, warning, info, error) - défaut: info
+  - center: Boolean pour centrer le texte - défaut: true
+#}
+{% set center = center|default(true) %}
+{% set type = type|default('info') %}
+
+{% set colors = {
+  'success': '#28a745',
+  'warning': '#ffc107',
+  'info': '#17a2b8',
+  'error': '#dc3545'
+} %}
+
+{% set bg_colors = {
+  'success': '#d4edda',
+  'warning': '#fff3cd',
+  'info': '#d1ecf1',
+  'error': '#f8d7da'
+} %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+  <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 15px; background-color: {{ bg_colors[type] }}; border: 1px solid {{ colors[type] }}; border-radius: 5px; margin-bottom: 20px;{% if center %} text-align: center;{% endif %}" valign="top">
+    <div style="color: {{ colors[type] }}; font-weight: 500;">
+      {{ content|raw }}
+    </div>
+  </td>
+</tr>

@@ -62,8 +62,7 @@ class ApiError<T = unknown> extends Error {
  * try {
  *   const response = await fetchAPI<{ id: number }>('/api/users', {
  *     method: 'POST',
- *     headers: { 'Content-Type': 'application/json' },
- *     body: JSON.stringify({ name: 'John Doe' }),
+ *     body: { name: 'John Doe' },
  *   });
  *   if (response.ok) {
  *     console.log(`Created user with ID: ${response.data.id}`);
@@ -74,11 +73,31 @@ class ApiError<T = unknown> extends Error {
  */
 const fetchAPI = async <T>(url: string, options: RequestInit = {}): Promise<FetchResponse<T> | ApiError<T>> => {
   try {
+    // Handle body serialization automatically
+    const requestOptions = { ...options };
+
+    if (
+      requestOptions.body &&
+      typeof requestOptions.body === 'object' &&
+      !(requestOptions.body instanceof FormData) &&
+      !(requestOptions.body instanceof URLSearchParams) &&
+      !(requestOptions.body instanceof Blob) &&
+      !(requestOptions.body instanceof ArrayBuffer) &&
+      typeof requestOptions.body !== 'string'
+    ) {
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      // Set Content-Type to application/json if not already set
+      requestOptions.headers = {
+        'Content-Type': 'application/json',
+        ...requestOptions.headers,
+      };
+    }
+
     const response = await fetch(url, {
-      ...options,
+      ...requestOptions,
       headers: {
         Accept: 'application/json',
-        ...options.headers,
+        ...requestOptions.headers,
       },
     });
 
@@ -136,8 +155,6 @@ const fetchAPI = async <T>(url: string, options: RequestInit = {}): Promise<Fetc
       return error;
     }
 
-    console.log('ICI');
-
     // Handle network errors or other failures
     const errorResponse = new Response(null, { status: 0, statusText: 'Network Error' });
     return new ApiError<T>(
@@ -150,4 +167,137 @@ const fetchAPI = async <T>(url: string, options: RequestInit = {}): Promise<Fetc
   }
 };
 
-export { fetchAPI, FetchResponse, ApiError };
+/**
+ * HTTP GET request
+ * @template T The expected type of the response data
+ * @param {string} url The URL to make the request to
+ * @param {Omit<RequestInit, 'method' | 'body'>} options Request options (headers, etc.)
+ * @returns {Promise<FetchResponse<T>>} A promise that resolves to a typed response
+ *
+ * @example
+ * const users = await fetchGET<User[]>('/api/users');
+ * if (users.ok) {
+ *   console.log(users.data); // typed as User[]
+ * }
+ */
+const fetchGET = async <T>(
+  url: string,
+  options: Omit<RequestInit, 'method' | 'body'> = {}
+): Promise<FetchResponse<T> | ApiError<T>> => {
+  return fetchAPI<T>(url, { ...options, method: 'GET' });
+};
+
+/**
+ * HTTP POST request
+ * @template T The expected type of the response data
+ * @param {string} url The URL to make the request to
+ * @param {any} body The request body data
+ * @param {Omit<RequestInit, 'method' | 'body'>} options Request options (headers, etc.)
+ * @returns {Promise<FetchResponse<T>>} A promise that resolves to a typed response
+ *
+ * @example
+ * const newUser = await fetchPOST<User>('/api/users', { name: 'John Doe', email: 'john@example.com' });
+ * if (newUser.ok) {
+ *   console.log('Created user:', newUser.data);
+ * }
+ */
+const fetchPOST = async <T>(
+  url: string,
+  body?: any,
+  options: Omit<RequestInit, 'method' | 'body'> = {}
+): Promise<FetchResponse<T> | ApiError<T>> => {
+  const requestOptions: RequestInit = {
+    ...options,
+    method: 'POST',
+  };
+
+  if (body !== undefined) {
+    requestOptions.body = body;
+  }
+
+  return fetchAPI<T>(url, requestOptions);
+};
+
+/**
+ * HTTP PUT request
+ * @template T The expected type of the response data
+ * @param {string} url The URL to make the request to
+ * @param {any} body The request body data
+ * @param {Omit<RequestInit, 'method' | 'body'>} options Request options (headers, etc.)
+ * @returns {Promise<FetchResponse<T>>} A promise that resolves to a typed response
+ *
+ * @example
+ * const updatedUser = await fetchPUT<User>('/api/users/1', { name: 'Jane Doe', email: 'jane@example.com' });
+ * if (updatedUser.ok) {
+ *   console.log('Updated user:', updatedUser.data);
+ * }
+ */
+const fetchPUT = async <T>(
+  url: string,
+  body?: any,
+  options: Omit<RequestInit, 'method' | 'body'> = {}
+): Promise<FetchResponse<T> | ApiError<T>> => {
+  const requestOptions: RequestInit = {
+    ...options,
+    method: 'PUT',
+  };
+
+  if (body !== undefined) {
+    requestOptions.body = body;
+  }
+
+  return fetchAPI<T>(url, requestOptions);
+};
+
+/**
+ * HTTP PATCH request
+ * @template T The expected type of the response data
+ * @param {string} url The URL to make the request to
+ * @param {any} body The request body data (partial update)
+ * @param {Omit<RequestInit, 'method' | 'body'>} options Request options (headers, etc.)
+ * @returns {Promise<FetchResponse<T>>} A promise that resolves to a typed response
+ *
+ * @example
+ * const patchedUser = await fetchPATCH<User>('/api/users/1', { email: 'newemail@example.com' });
+ * if (patchedUser.ok) {
+ *   console.log('Patched user:', patchedUser.data);
+ * }
+ */
+const fetchPATCH = async <T>(
+  url: string,
+  body?: any,
+  options: Omit<RequestInit, 'method' | 'body'> = {}
+): Promise<FetchResponse<T> | ApiError<T>> => {
+  const requestOptions: RequestInit = {
+    ...options,
+    method: 'PATCH',
+  };
+
+  if (body !== undefined) {
+    requestOptions.body = body;
+  }
+
+  return fetchAPI<T>(url, requestOptions);
+};
+
+/**
+ * HTTP DELETE request
+ * @template T The expected type of the response data
+ * @param {string} url The URL to make the request to
+ * @param {Omit<RequestInit, 'method' | 'body'>} options Request options (headers, etc.)
+ * @returns {Promise<FetchResponse<T>>} A promise that resolves to a typed response
+ *
+ * @example
+ * const result = await fetchDELETE<{ success: boolean }>('/api/users/1');
+ * if (result.ok) {
+ *   console.log('User deleted successfully:', result.data);
+ * }
+ */
+const fetchDELETE = async <T>(
+  url: string,
+  options: Omit<RequestInit, 'method' | 'body'> = {}
+): Promise<FetchResponse<T> | ApiError<T>> => {
+  return fetchAPI<T>(url, { ...options, method: 'DELETE' });
+};
+
+export { fetchAPI, fetchGET, fetchPOST, fetchPUT, fetchPATCH, fetchDELETE, FetchResponse, ApiError };

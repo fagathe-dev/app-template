@@ -2,6 +2,7 @@
 
 namespace Admin\Service;
 
+use Admin\Service\UserEmailService;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserRequestService;
@@ -45,6 +46,7 @@ final class UserService
         private readonly UserRequestService $userRequestService,
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
+        private readonly UserEmailService $userEmailService,
 
     ) {
         $this->finder = new Finder();
@@ -79,8 +81,8 @@ final class UserService
      */
     public function update(Request $request, User $user): object
     {
-        $action = $request->request->get('a');
         $payload = json_decode($request->getContent(), true);
+        $action = ($payload['q'] ?? null) ?? $request->request->get('q', null) ?? $request->request->get('q', null);
 
         if (!$action) {
             $this->generateLog(
@@ -107,12 +109,20 @@ final class UserService
                 'update-user-infos' => $this->updateUserInfo($request, $user),
                 // 'generate-api-token' => $this->userRequestService->generateApiToken($user),
                 // 'reset-password' => $this->userRequestService->changePassword($request, $user),
-                'change-role' => $this->updateUserRoles($request, $user),
+                'change-role' => $this->updateUserRoles($payload, $user),
                 // 'toggle-active' => $this->userRequestService->toggleActive($user),
                 default => null,
             };
         } catch (\Throwable $th) {
-            //throw $th;
+            $this->generateLog(
+                ['exception' => $th->getMessage(), 'data' => $payload],
+                ['action' => __METHOD__ . ' ' . $action, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
+                LoggerLevelEnum::Error
+            );
+
+            return $this->sendViolations(
+                violations: ['exception' => 'Une erreur est survenue lors de la mise à jour de l\'utilisateur.'],
+            );
         }
 
         $this->generateLog(
@@ -124,23 +134,20 @@ final class UserService
         return $response;
     }
 
-    private function updateUserRoles(Request $request, User $user): object
+    private function updateUserRoles(array $payload, User $user): object
     {
-        $data = json_decode($request->getContent(), true);
-
-        $role = $data['role'] ?? null;
-
+        $role = $payload['role'] ?? null;
         if ($role !== null) {
-
+            
             if (is_string($role)) {
                 $role = RoleEnum::tryFrom($role);
             }
-
-
+            
+            
             if ($role instanceof RoleEnum && in_array($role, RoleEnum::cases())) {
                 $user->setRoles([$role->value]);
                 $this->save($user);
-
+                
                 $this->generateLog(
                     content: [
                         'message' => 'Le role de l\'utilisateur `' . $user->getUserIdentifier() . '` a été mis à jour, nouveau rôle ' . RoleEnum::matchLabel($role),
@@ -149,6 +156,9 @@ final class UserService
                     context: ['action' => __METHOD__, 'uid' => $this->getUser()?->getUserIdentifier() ?? 'anonymous'],
                     level: LoggerLevelEnum::Debug
                 );
+
+                // Envoie d'un email de notification du changement de rôle
+                $this->userEmailService->sendChangeRoleEmail($user);
 
                 return $this->sendJson(
                     data: [

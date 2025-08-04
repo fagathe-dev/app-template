@@ -1,134 +1,226 @@
 import { fetchAPI } from './fetch';
 
+/**
+ * Configuration interface for FormManager initialization
+ */
 interface FormType {
   form: HTMLFormElement;
   initialData?: FormDataType;
 }
 
+/**
+ * Type definition for form data values
+ */
 type FormDataType = Record<string, string | boolean | number | null | Array<string | boolean | number | null>>;
 
 /**
- * FormManager - A class to handle form operations
+ * FormManager - A comprehensive class for handling form operations
  *
- * This class provides functionality to:
- * - Get form data from all form fields (input, select, textarea)
- * - Fill form with initial data
- * - Handle form validation errors
- * - Reset form to initial state
+ * Provides functionality for:
+ * - Extracting form data from all supported field types
+ * - Populating forms with initial data
+ * - Handling validation errors and user feedback
+ * - Resetting forms to their initial state
+ * - Managing field validation states
  *
  * @example
- * // Create a form manager instance
- * const initialData = {
- *   transport: ['Train', 'Bus'],
- *   isActive: false,
- *   exampleSelect: '4',
- *   password: 'testPassword',
- *   dueDate: '2002-01-12',
- *   message: 'Some message'
- * };
- *
+ * ```typescript
+ * // Basic usage
  * const formManager = new FormManager({
- *   form: document.getElementById('myForm'),
- *   initialData
+ *   form: document.getElementById('myForm') as HTMLFormElement
  * });
  *
- * // Get form data
+ * // With initial data
+ * const formManager = new FormManager({
+ *   form: document.getElementById('myForm') as HTMLFormElement,
+ *   initialData: {
+ *     transport: ['Train', 'Bus'],
+ *     isActive: false,
+ *     exampleSelect: '4',
+ *     password: 'testPassword',
+ *     dueDate: '2002-01-12',
+ *     message: 'Some message'
+ *   }
+ * });
+ *
+ * // Extract form data
  * const data = formManager.getData();
  *
  * // Handle validation errors
- * const violations = {
+ * formManager.handleViolations({
  *   transport: 'This field is required',
- *   isActive: 'This field is required',
- *   message: 'This field is required',
- *   dueDate: 'This field is required'
- * };
- * formManager.handleViolations(violations);
- *
- * // Reset form
- * formManager.reset();
+ *   message: 'This field is required'
+ * });
+ * ```
  */
 class FormManager {
-  form: HTMLFormElement;
-  initialData: FormDataType;
-  static FORM_FIELD_SELECTOR = 'input, select, textarea';
+  // Constants for field selection and validation
+  private static readonly FORM_FIELD_SELECTOR = 'input, select, textarea';
+  private static readonly FEEDBACK_CLASSES = '.invalid-feedback, .valid-feedback';
+  private static readonly VALIDATION_CLASSES = {
+    VALID: 'is-valid',
+    INVALID: 'is-invalid',
+  } as const;
 
-  constructor({ form, initialData }: FormType) {
+  private static readonly INPUT_TYPES = {
+    CHECKBOX: 'checkbox',
+    RADIO: 'radio',
+    TEXT: 'text',
+    NUMBER: 'number',
+    DATE: 'date',
+    DATETIME: 'datetime',
+    PASSWORD: 'password',
+    HIDDEN: 'hidden',
+    EMAIL: 'email',
+    URL: 'url',
+    TEL: 'tel',
+  } as const;
+
+  // Core properties
+  private readonly form: HTMLFormElement;
+  private readonly initialData: FormDataType;
+
+  /**
+   * Creates a new FormManager instance
+   * @param config - Configuration object containing form and optional initial data
+   */
+  constructor({ form, initialData = {} }: FormType) {
     this.form = form;
-    this.initialData = initialData as FormDataType;
-    this.init();
+    this.initialData = initialData;
+    this.initialize();
   }
 
   /**
-   * Get all form fields
-   * @returns NodeListOf<Element> List of form fields
+   * Initializes the form with initial data if provided
+   */
+  private initialize(): void {
+    if (Object.keys(this.initialData).length > 0) {
+      this.fillData(this.initialData);
+    }
+  }
+
+  /**
+   * Gets all form fields using the standard selector
    */
   private getFormFields(): NodeListOf<Element> {
     return this.form.querySelectorAll(FormManager.FORM_FIELD_SELECTOR);
   }
 
   /**
-   * Reset validation state of a field
-   * @param field The form field element
+   * Finds the appropriate container for a form field
+   */
+  private getFieldContainer(field: Element): HTMLFieldSetElement | HTMLDivElement {
+    const fieldset = field.closest('fieldset') as HTMLFieldSetElement;
+    const div = field.closest('div') as HTMLDivElement;
+    return fieldset || div;
+  }
+
+  /**
+   * Resets validation state of a specific field
+   * @param field - The form field element to reset
    */
   private resetFieldState(field: Element): void {
-    const container = (field.closest('fieldset') as HTMLFieldSetElement) || (field.closest('div') as HTMLDivElement);
-    const feedback = container.querySelector('.invalid-feedback, .valid-feedback');
+    const container = this.getFieldContainer(field);
+    const feedback = container?.querySelector(FormManager.FEEDBACK_CLASSES);
 
-    field.classList.remove('is-valid', 'is-invalid');
+    field.classList.remove(FormManager.VALIDATION_CLASSES.VALID, FormManager.VALIDATION_CLASSES.INVALID);
     feedback?.remove();
   }
 
   /**
-   * Extract value from an input field based on its type
-   * @param field Input field element
-   * @param data Current form data object
+   * Checks if a field name already exists in the data object
    */
-  private handleInputField(field: HTMLInputElement, data: FormDataType): void {
-    const { type, name, value } = field;
+  private isFieldProcessed(fieldName: string, data: FormDataType): boolean {
+    return Object.prototype.hasOwnProperty.call(data, fieldName);
+  }
 
-    if (data.hasOwnProperty(name)) return;
+  /**
+   * Processes checkbox and radio input fields
+   */
+  private processChoiceInputs(field: HTMLInputElement, data: FormDataType): void {
+    const { name } = field;
+    const checkedInputs = this.form.querySelectorAll(`input[name="${name}"]:checked`) as NodeListOf<HTMLInputElement>;
 
-    if (type === 'checkbox' || type === 'radio') {
-      const choices = this.form.querySelectorAll(`input[name="${name}"]:checked`) as NodeListOf<HTMLInputElement>;
+    const checkedValues = Array.from(checkedInputs).map((input) => input.value);
 
-      if (Array.from(choices).length > 1) {
-        data[name] = Array.from(choices).map((el) => el.value);
-      } else {
-        data[name] = choices[0]?.value ?? null;
-      }
-    } else if (['text', 'number', 'date', 'datetime', 'password', 'hidden'].includes(type)) {
-      data[name] = value === '' ? null : value;
+    if (checkedValues.length > 1) {
+      data[name] = checkedValues;
+    } else {
+      data[name] = checkedValues[0] || null;
     }
   }
 
   /**
-   * Extract value from a select field
-   * @param field Select field element
-   * @param data Current form data object
+   * Processes standard input fields (text, number, date, etc.)
+   */
+  private processStandardInputs(field: HTMLInputElement, data: FormDataType): void {
+    const { name, value, type } = field;
+
+    const supportedTypes = [
+      FormManager.INPUT_TYPES.TEXT,
+      FormManager.INPUT_TYPES.NUMBER,
+      FormManager.INPUT_TYPES.DATE,
+      FormManager.INPUT_TYPES.DATETIME,
+      FormManager.INPUT_TYPES.PASSWORD,
+      FormManager.INPUT_TYPES.HIDDEN,
+      FormManager.INPUT_TYPES.EMAIL,
+      FormManager.INPUT_TYPES.URL,
+      FormManager.INPUT_TYPES.TEL,
+    ];
+
+    if (supportedTypes.includes(type as any)) {
+      data[name] = value.trim() === '' ? null : value;
+    }
+  }
+
+  /**
+   * Extracts value from an input field based on its type
+   */
+  private handleInputField(field: HTMLInputElement, data: FormDataType): void {
+    const { type, name } = field;
+
+    if (this.isFieldProcessed(name, data)) return;
+
+    if (type === FormManager.INPUT_TYPES.CHECKBOX || type === FormManager.INPUT_TYPES.RADIO) {
+      this.processChoiceInputs(field, data);
+    } else {
+      this.processStandardInputs(field, data);
+    }
+  }
+
+  /**
+   * Extracts value from a select field
    */
   private handleSelectField(field: HTMLSelectElement, data: FormDataType): void {
     const { name } = field;
-    const selectedOptions = Array.from(field.options).filter((opt) => opt.selected);
+    const selectedOptions = Array.from(field.options).filter((option) => option.selected);
 
     if (selectedOptions.length > 1) {
-      data[name] = selectedOptions.map((opt) => opt.value);
+      data[name] = selectedOptions.map((option) => option.value);
     } else {
       data[name] = field.value || null;
     }
   }
 
   /**
-   * Get all form data
-   * @returns FormDataType Object containing all form field values
+   * Extracts value from a textarea field
    */
-  getData(): FormDataType {
+  private handleTextareaField(field: HTMLTextAreaElement, data: FormDataType): void {
+    const { name, value } = field;
+    data[name] = value.trim() === '' ? null : value;
+  }
+
+  /**
+   * Extracts all form data into a structured object
+   */
+  public getData(): FormDataType {
     const data: FormDataType = {};
     const fields = this.getFormFields();
 
     for (const field of fields) {
       const { tagName } = field;
 
-      switch (tagName) {
+      switch (tagName.toUpperCase()) {
         case 'INPUT':
           this.handleInputField(field as HTMLInputElement, data);
           break;
@@ -136,8 +228,7 @@ class FormManager {
           this.handleSelectField(field as HTMLSelectElement, data);
           break;
         case 'TEXTAREA':
-          const { name, value } = field as HTMLTextAreaElement;
-          data[name] = value;
+          this.handleTextareaField(field as HTMLTextAreaElement, data);
           break;
       }
     }
@@ -146,56 +237,75 @@ class FormManager {
   }
 
   /**
-   * Set value for an input field based on its type
-   * @param field Input field element
-   * @param value Value to set
+   * Sets value for checkbox and radio inputs
+   */
+  private setChoiceInputValue(field: HTMLInputElement, value: FormDataType[string]): void {
+    if (Array.isArray(value)) {
+      field.checked = value.includes(field.value);
+    } else {
+      field.checked = value === true || field.value === String(value);
+    }
+  }
+
+  /**
+   * Sets value for standard input fields
+   */
+  private setStandardInputValue(field: HTMLInputElement, value: FormDataType[string]): void {
+    field.value = String(value || '');
+  }
+
+  /**
+   * Sets value for an input field based on its type
    */
   private fillInputField(field: HTMLInputElement, value: FormDataType[string]): void {
     const { type } = field;
 
-    if (type === 'checkbox' || type === 'radio') {
-      if (Array.isArray(value)) {
-        field.checked = value.includes(field.value);
-      } else {
-        field.checked = value === true || field.value === value;
-      }
-    } else if (['text', 'number', 'date', 'datetime', 'password', 'hidden'].includes(type)) {
-      field.value = (value as string) ?? '';
+    if (type === FormManager.INPUT_TYPES.CHECKBOX || type === FormManager.INPUT_TYPES.RADIO) {
+      this.setChoiceInputValue(field, value);
+    } else {
+      this.setStandardInputValue(field, value);
     }
   }
 
   /**
-   * Set value for a select field
-   * @param field Select field element
-   * @param value Value to set
+   * Sets value for a select field (single or multiple selection)
    */
   private fillSelectField(field: HTMLSelectElement, value: FormDataType[string]): void {
+    // Reset all options first
+    Array.from(field.options).forEach((option) => {
+      option.selected = false;
+    });
+
     if (Array.isArray(value)) {
-      Array.from(field.options).forEach((opt) => {
-        opt.selected = value.includes(opt.value);
+      // Handle multiple selection
+      Array.from(field.options).forEach((option) => {
+        option.selected = value.includes(option.value);
       });
-    } else if (value !== null && value !== '') {
-      const option = Array.from(field.options).find((opt) => opt.value === value);
-      if (option) option.selected = true;
+    } else if (value !== null && value !== undefined && value !== '') {
+      // Handle single selection
+      const targetOption = Array.from(field.options).find((option) => option.value === String(value));
+      if (targetOption) {
+        targetOption.selected = true;
+      }
     }
   }
 
   /**
-   * Fill form with data
-   * @param data Data to fill the form with
+   * Populates form fields with provided data
    */
-  fillData(data: FormDataType): void {
+  public fillData(data: FormDataType): void {
     const fields = this.getFormFields();
 
     for (const field of fields) {
-      const { tagName, name } = field as HTMLInputElement;
+      const { tagName } = field;
+      const fieldName = (field as HTMLInputElement).name;
 
-      if (!data.hasOwnProperty(name)) continue;
+      if (!Object.prototype.hasOwnProperty.call(data, fieldName)) continue;
 
-      const value = data[name];
+      const value = data[fieldName];
       this.resetFieldState(field);
 
-      switch (tagName) {
+      switch (tagName.toUpperCase()) {
         case 'INPUT':
           this.fillInputField(field as HTMLInputElement, value);
           break;
@@ -203,145 +313,174 @@ class FormManager {
           this.fillSelectField(field as HTMLSelectElement, value);
           break;
         case 'TEXTAREA':
-          (field as HTMLTextAreaElement).value = (value as string) ?? '';
+          (field as HTMLTextAreaElement).value = String(value || '');
           break;
       }
     }
   }
 
   /**
-   * Display error message for a specific field
-   * @param field The form field element
-   * @param container The container element of the field
-   * @param error The existing error element if any
-   * @param errorMessage The error message to display
-   * @param isValid Whether the field is valid
+   * Escapes HTML content to prevent XSS attacks
+   */
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /**
+   * Creates and inserts an error message element
+   */
+  private createErrorElement(container: HTMLElement, errorMessage: string): void {
+    const errorElement = document.createElement('small');
+    errorElement.innerHTML = this.escapeHtml(errorMessage);
+    errorElement.className = 'invalid-feedback';
+    container.appendChild(errorElement);
+  }
+
+  /**
+   * Applies validation styles for checkbox and radio groups
+   */
+  private applyChoiceFieldValidation(field: HTMLInputElement, isValid: boolean): void {
+    const fieldName = field.name;
+    const relatedFields = this.form.querySelectorAll(`input[name="${fieldName}"]`) as NodeListOf<HTMLInputElement>;
+
+    relatedFields.forEach((relatedField) => {
+      relatedField.classList.toggle(FormManager.VALIDATION_CLASSES.INVALID, !isValid);
+      relatedField.classList.toggle(FormManager.VALIDATION_CLASSES.VALID, isValid);
+    });
+  }
+
+  /**
+   * Applies validation styles for standard fields
+   */
+  private applyStandardFieldValidation(field: Element, isValid: boolean): void {
+    field.classList.toggle(FormManager.VALIDATION_CLASSES.INVALID, !isValid);
+    field.classList.toggle(FormManager.VALIDATION_CLASSES.VALID, isValid);
+  }
+
+  /**
+   * Displays or removes error message for a specific field
    */
   private displayFieldError(
     field: Element,
     container: HTMLFieldSetElement | HTMLDivElement,
-    error: Element | null,
+    existingError: Element | null,
     errorMessage: string | null,
     isValid: boolean
   ): void {
-    const isCheckboxOrRadio =
-      field.tagName === 'INPUT' && ['checkbox', 'radio'].includes((field as HTMLInputElement).type);
+    const isChoiceField = field.tagName === 'INPUT' && ['checkbox', 'radio'].includes((field as HTMLInputElement).type);
 
-    if (!isValid) {
-      if (isCheckboxOrRadio) {
-        const choices = this.form.querySelectorAll(
-          `input[name="${(field as HTMLInputElement).name}"]`
-        ) as NodeListOf<HTMLInputElement>;
-        choices.forEach((el: HTMLInputElement) => {
-          el.classList.add('is-invalid');
-        });
-      } else {
-        field.classList.add('is-invalid');
-      }
-
-      if (error === null && errorMessage) {
-        const errorElement = document.createElement('small');
-        errorElement.innerHTML = errorMessage;
-        errorElement.classList.add('invalid-feedback');
-        container.insertAdjacentElement('beforeend', errorElement);
-      }
+    // Apply validation styles
+    if (isChoiceField) {
+      this.applyChoiceFieldValidation(field as HTMLInputElement, isValid);
     } else {
-      field.classList.remove('is-invalid');
-      field.classList.add('is-valid');
-      error?.remove();
+      this.applyStandardFieldValidation(field, isValid);
+    }
+
+    // Handle error message display
+    if (!isValid && errorMessage && !existingError) {
+      this.createErrorElement(container, errorMessage);
+    } else if (isValid && existingError) {
+      existingError.remove();
     }
   }
 
   /**
-   * Handle form validation violations
-   * @param violations Object containing field names and their error messages
+   * Handles form validation violations and displays appropriate feedback
    */
-  handleViolations(violations: FormDataType): void {
+  public handleViolations(violations: FormDataType): void {
     const fields = this.form.querySelectorAll(FormManager.FORM_FIELD_SELECTOR);
 
     for (const field of fields) {
-      const { name } = field as HTMLInputElement;
-      const container = (field.closest('fieldset') as HTMLFieldSetElement) || (field.closest('div') as HTMLDivElement);
-      const error = container.querySelector('.invalid-feedback');
-      const hasViolation = violations.hasOwnProperty(name);
-      const errorMessage = hasViolation ? (violations[name] as string) : null;
+      const fieldName = (field as HTMLInputElement).name;
+      const container = this.getFieldContainer(field);
+      const existingError = container?.querySelector('.invalid-feedback');
+      const hasViolation = Object.prototype.hasOwnProperty.call(violations, fieldName);
+      const errorMessage = hasViolation ? String(violations[fieldName]) : null;
 
-      this.displayFieldError(field, container, error, errorMessage, !hasViolation);
+      if (container) {
+        this.displayFieldError(field, container, existingError, errorMessage, !hasViolation);
+      }
     }
   }
 
-  resetFormFieldsState() {
+  /**
+   * Resets validation state of all form fields
+   */
+  public resetFormFieldsState(): void {
     const fields = this.getFormFields();
-
-    return fields.forEach((f) => this.resetFieldState(f));
+    fields.forEach((field) => this.resetFieldState(field));
   }
 
   /**
-   * Reset form to its initial state
+   * Resets input field to its default state
    */
-  reset(): void {
+  private resetInputField(field: HTMLInputElement): void {
+    const { type } = field;
+
+    if (type === FormManager.INPUT_TYPES.CHECKBOX || type === FormManager.INPUT_TYPES.RADIO) {
+      field.checked = false;
+    } else {
+      field.value = '';
+    }
+  }
+
+  /**
+   * Resets select field to its default state
+   */
+  private resetSelectField(field: HTMLSelectElement): void {
+    Array.from(field.options).forEach((option) => {
+      option.selected = false;
+    });
+  }
+
+  /**
+   * Resets textarea field to its default state
+   */
+  private resetTextareaField(field: HTMLTextAreaElement): void {
+    field.value = '';
+  }
+
+  /**
+   * Resets form to its initial state
+   */
+  public reset(): void {
     const fields = this.getFormFields();
 
     fields.forEach((field) => {
       const { tagName } = field;
 
-      switch (tagName) {
+      switch (tagName.toUpperCase()) {
         case 'INPUT':
-          const input = field as HTMLInputElement;
-          if (input.type === 'checkbox' || input.type === 'radio') {
-            input.checked = false;
-          } else {
-            input.value = '';
-          }
+          this.resetInputField(field as HTMLInputElement);
           break;
         case 'SELECT':
-          Array.from((field as HTMLSelectElement).options).forEach((opt) => (opt.selected = false));
+          this.resetSelectField(field as HTMLSelectElement);
           break;
         case 'TEXTAREA':
-          (field as HTMLTextAreaElement).value = '';
+          this.resetTextareaField(field as HTMLTextAreaElement);
           break;
       }
     });
+
+    // Reset validation states
+    this.resetFormFieldsState();
   }
 
-  init() {
-    if (this.initialData) {
-      this.fillData(this.initialData);
-    }
+  /**
+   * Gets the current initial data
+   */
+  public getInitialData(): FormDataType {
+    return { ...this.initialData };
+  }
+
+  /**
+   * Gets the form element
+   */
+  public getForm(): HTMLFormElement {
+    return this.form;
   }
 }
 
-/**
- * Usage Example:
- */
-const example = `
-// Initialize form manager
-const initialData: FormDataType = {
-    transport: ['Train', 'Bus'],
-    isActive: false,
-    exampleSelect: '4',
-    password: 'testPassword',
-    dueDate: '2002-01-12',
-    message: 'Example message'
-};
-
-const violations = {
-    transport: 'This field is required',
-    isActive: 'This field is required',
-    message: 'This field is required',
-    dueDate: 'This field is required'
-};
-
-const formManager = new FormManager({ 
-    form: document.getElementById('formManagerId') as HTMLFormElement, 
-    initialData 
-});
-
-// Handle form violations
-formManager.handleViolations(violations);
-
-// Reset form when needed
-formManager.reset();
-`;
-
-export { FormManager, FormDataType };
+export { FormManager, FormDataType, FormType };

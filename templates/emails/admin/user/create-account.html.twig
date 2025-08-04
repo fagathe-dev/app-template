@@ -1,0 +1,44 @@
+{% extends "emails/base.html.twig" %}
+
+{% block content %}
+  {# Titre de bienvenue avec emoji #}
+  {% include "emails/components/heading.html.twig" with {
+    'text': user.name ?? user.username,
+    'emoji': '👋',
+    'center': true
+  } %}
+
+  {# Titre principal #}
+  {% include "emails/components/heading.html.twig" with {
+    'text': 'Votre compte a bien été créé sur notre plateforme. Nous sommes ravis de vous accueillir !',
+    'center': false
+  } %}
+
+  {# Informations de connexion #}
+  {% include "emails/components/user-info.html.twig" with {
+    'title': 'Voici vos identifiants de connexion :',
+    'info_items': [
+      {'label': 'Nom d\'utilisateur (E-mail)', 'value': user.email},
+      {'label': 'Mot de passe', 'value': user.password}
+    ]
+  } %}
+
+  {# Message d'activation #}
+  {% include "emails/components/paragraph.html.twig" with {
+    'content': 'Pour activer votre compte et commencer à utiliser nos services, veuillez cliquer sur le lien ci-dessous :',
+    'center': true,
+    'margin_bottom': '10px'
+  } %}
+
+  {# Bouton d'activation #}
+  {% include "emails/components/button.html.twig" with {
+    'url': activation_link,
+    'text': 'Vérifiez votre email',
+    'color': '#4b38b3'
+  } %}
+
+  {# Lien de fallback #}
+  {% include "emails/components/link-fallback.html.twig" with {
+    'url': activation_link
+  } %}
+{% endblock %}

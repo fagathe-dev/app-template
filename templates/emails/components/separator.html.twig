@@ -1,0 +1,19 @@
+{#
+  Composant de séparateur pour les emails
+  
+  Paramètres:
+  - height: Hauteur du séparateur en px - défaut: 20
+  - color: Couleur de la ligne - défaut: #e9ecef
+  - width: Largeur en pourcentage - défaut: 100%
+  - margin: Marge autour du séparateur - défaut: 20px 0
+#}
+{% set height = height|default(20) %}
+{% set color = color|default('#e9ecef') %}
+{% set width = width|default('100%') %}
+{% set margin = margin|default('20px 0') %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: {{ margin }};">
+  <td style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0;" valign="top">
+    <hr style="border: none; height: 1px; background-color: {{ color }}; width: {{ width }}; margin: {{ margin }} auto;">
+  </td>
+</tr>

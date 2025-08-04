@@ -22,11 +22,19 @@ var ApiError = class extends Error {
 };
 var fetchAPI = async (url, options = {}) => {
   try {
+    const requestOptions = { ...options };
+    if (requestOptions.body && typeof requestOptions.body === "object" && !(requestOptions.body instanceof FormData) && !(requestOptions.body instanceof URLSearchParams) && !(requestOptions.body instanceof Blob) && !(requestOptions.body instanceof ArrayBuffer) && typeof requestOptions.body !== "string") {
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      requestOptions.headers = {
+        "Content-Type": "application/json",
+        ...requestOptions.headers
+      };
+    }
     const response = await fetch(url, {
-      ...options,
+      ...requestOptions,
       headers: {
         Accept: "application/json",
-        ...options.headers
+        ...requestOptions.headers
       }
     });
     const clonedResponse = response.clone();
@@ -66,7 +74,6 @@ var fetchAPI = async (url, options = {}) => {
       console.log(error);
       return error;
     }
-    console.log("ICI");
     const errorResponse = new Response(null, { status: 0, statusText: "Network Error" });
     return new ApiError(
       0,
@@ -77,7 +84,48 @@ var fetchAPI = async (url, options = {}) => {
     );
   }
 };
+var fetchGET = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: "GET" });
+};
+var fetchPOST = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "POST"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPUT = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "PUT"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPATCH = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: "PATCH"
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchDELETE = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: "DELETE" });
+};
 export {
   ApiError,
-  fetchAPI
+  fetchAPI,
+  fetchDELETE,
+  fetchGET,
+  fetchPATCH,
+  fetchPOST,
+  fetchPUT
 };

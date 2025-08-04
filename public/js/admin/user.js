@@ -1,72 +1,164 @@
 var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defNormalProp = (obj, key, value) =>
+  key in obj
+    ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value })
+    : (obj[key] = value);
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== 'symbol' ? key + '' : key, value);
 
 // public/ts/components/Alert.ts
 var _Alert = class _Alert {
+  /**
+   * Creates a new Alert instance
+   * @param message - The text content to display
+   * @param type - The alert status type (info, success, warning, danger)
+   * @param options - Configuration options for the alert
+   */
   constructor(message, type = _Alert.DEFAULT_TYPE, options = {}) {
-    __publicField(this, "alertContainer", null);
-    __publicField(this, "options");
-    __publicField(this, "alert", null);
-    __publicField(this, "closeButton", null);
-    __publicField(this, "dismissTimeout", null);
-    __publicField(this, "type");
-    __publicField(this, "message");
-    __publicField(this, "dismiss", (e) => {
-      if (e) {
-        e.preventDefault();
-      }
-      if (this.dismissTimeout) {
-        window.clearTimeout(this.dismissTimeout);
-      }
-      this.alert?.remove();
+    // DOM elements
+    __publicField(this, 'alertContainer', null);
+    __publicField(this, 'alert', null);
+    __publicField(this, 'closeButton', null);
+    // State management
+    __publicField(this, 'dismissTimeout', null);
+    __publicField(this, 'options');
+    __publicField(this, 'type');
+    __publicField(this, 'message');
+    /**
+     * Dismisses the alert and cleans up resources
+     */
+    __publicField(this, 'dismiss', (event) => {
+      event?.preventDefault();
+      this.clearDismissTimeout();
+      this.removeAlert();
     });
     this.message = message;
     this.type = type;
     this.options = { ..._Alert.DEFAULT_OPTIONS, ...options };
-    this.init();
+    this.initialize();
     this.render();
   }
-  init() {
-    this.alertContainer = document.getElementById(
-      this.options.containerId || _Alert.DEFAULT_CONTAINER_ID
-    );
+  /**
+   * Initializes the alert container and processes options
+   */
+  initialize() {
+    this.setupContainer();
+    this.processDuration();
+  }
+  /**
+   * Sets up or finds the alert container in the DOM
+   */
+  setupContainer() {
+    this.alertContainer = document.getElementById(this.options.containerId);
     if (!this.alertContainer) {
-      this.alertContainer = document.createElement("div");
-      this.alertContainer.id = this.options.containerId || _Alert.DEFAULT_CONTAINER_ID;
+      this.alertContainer = this.createContainer();
       document.body.appendChild(this.alertContainer);
     }
-    if (this.options.duration) {
+  }
+  /**
+   * Creates a new container element for alerts
+   */
+  createContainer() {
+    const container = document.createElement('div');
+    container.id = this.options.containerId;
+    container.setAttribute('role', 'status');
+    container.setAttribute('aria-live', 'polite');
+    return container;
+  }
+  /**
+   * Converts duration from seconds to milliseconds if needed
+   */
+  processDuration() {
+    if (this.options.duration > 0 && this.options.duration < 100) {
       this.options.duration = this.options.duration * 1e3;
     }
   }
-  setUpAlert() {
-    this.alert = document.createElement("div");
-    this.alert.className = `alert alert-${this.type} alert-borderless shadow fade show${this.options.dismissible ? " alert-dismissible" : ""}`;
-    this.alert.role = "alert";
-    this.alert.innerHTML = `<small>${this.message}</small>`;
-    if (this.options.dismissible) {
-      this.closeButton = document.createElement("button");
-      this.closeButton.className = "btn-close";
-      this.closeButton.setAttribute("data-bs-dismiss", "alert");
-      this.closeButton.setAttribute("aria-label", "Close");
-      this.closeButton.addEventListener("click", this.dismiss);
-      this.alert.insertAdjacentElement("beforeend", this.closeButton);
+  /**
+   * Clears the auto-dismiss timeout if it exists
+   */
+  clearDismissTimeout() {
+    if (this.dismissTimeout) {
+      window.clearTimeout(this.dismissTimeout);
+      this.dismissTimeout = null;
     }
   }
-  render() {
-    this.setUpAlert();
-    this.alertContainer?.insertAdjacentElement("afterbegin", this.alert);
-    if (this.options.duration && this.options.duration > 0) {
+  /**
+   * Removes the alert element from the DOM
+   */
+  removeAlert() {
+    if (this.alert) {
+      this.alert.remove();
+      this.alert = null;
+    }
+  }
+  /**
+   * Creates and configures the alert element
+   */
+  createAlert() {
+    this.alert = document.createElement('div');
+    this.alert.className = this.buildAlertClasses();
+    this.alert.setAttribute('role', 'alert');
+    this.alert.innerHTML = `<small>${this.escapeHtml(this.message)}</small>`;
+    if (this.options.dismissible) {
+      this.attachDismissButton();
+    }
+  }
+  /**
+   * Builds the CSS classes for the alert element
+   */
+  buildAlertClasses() {
+    const classes = ['alert', `alert-${this.type}`, 'alert-borderless', 'shadow', 'fade', 'show'];
+    if (this.options.dismissible) {
+      classes.push('alert-dismissible');
+    }
+    return classes.join(' ');
+  }
+  /**
+   * Creates and attaches the dismiss button to the alert
+   */
+  attachDismissButton() {
+    this.closeButton = document.createElement('button');
+    this.closeButton.type = 'button';
+    this.closeButton.className = 'btn-close';
+    this.closeButton.setAttribute('data-bs-dismiss', 'alert');
+    this.closeButton.setAttribute('aria-label', 'Close');
+    this.closeButton.addEventListener('click', this.dismiss);
+    this.alert?.appendChild(this.closeButton);
+  }
+  /**
+   * Escapes HTML characters to prevent XSS attacks
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  /**
+   * Sets up auto-dismiss functionality if duration is specified
+   */
+  setupAutoDismiss() {
+    if (this.options.duration > 0) {
       this.dismissTimeout = window.setTimeout(() => this.dismiss(), this.options.duration);
     }
   }
+  /**
+   * Renders the alert to the DOM
+   */
+  render() {
+    this.createAlert();
+    if (this.alert && this.alertContainer) {
+      this.alertContainer.insertAdjacentElement('afterbegin', this.alert);
+      this.setupAutoDismiss();
+    }
+  }
 };
-__publicField(_Alert, "DEFAULT_TYPE", "info");
-__publicField(_Alert, "DEFAULT_CONTAINER_ID", "alert-container");
-__publicField(_Alert, "DEFAULT_OPTIONS", {
+// Constants for default configuration
+__publicField(_Alert, 'DEFAULT_TYPE', 'info');
+__publicField(_Alert, 'DEFAULT_CONTAINER_ID', 'alert-container');
+__publicField(_Alert, 'DEFAULT_OPTIONS', {
   containerId: _Alert.DEFAULT_CONTAINER_ID,
-  dismissible: false
+  duration: 0,
+  // 0 means no auto-dismiss
+  dismissible: false,
 });
 var Alert = _Alert;
 
@@ -74,13 +166,13 @@ var Alert = _Alert;
 var ApiError = class extends Error {
   constructor(status, statusText, message, response, data) {
     super(message);
-    __publicField(this, "ok", false);
-    __publicField(this, "headers");
-    __publicField(this, "status");
-    __publicField(this, "statusText");
-    __publicField(this, "data");
-    __publicField(this, "response");
-    this.name = "ApiError";
+    __publicField(this, 'ok', false);
+    __publicField(this, 'headers');
+    __publicField(this, 'status');
+    __publicField(this, 'statusText');
+    __publicField(this, 'data');
+    __publicField(this, 'response');
+    this.name = 'ApiError';
     this.status = status;
     this.statusText = statusText;
     this.response = response;
@@ -90,21 +182,37 @@ var ApiError = class extends Error {
 };
 var fetchAPI = async (url, options = {}) => {
   try {
+    const requestOptions = { ...options };
+    if (
+      requestOptions.body &&
+      typeof requestOptions.body === 'object' &&
+      !(requestOptions.body instanceof FormData) &&
+      !(requestOptions.body instanceof URLSearchParams) &&
+      !(requestOptions.body instanceof Blob) &&
+      !(requestOptions.body instanceof ArrayBuffer) &&
+      typeof requestOptions.body !== 'string'
+    ) {
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      requestOptions.headers = {
+        'Content-Type': 'application/json',
+        ...requestOptions.headers,
+      };
+    }
     const response = await fetch(url, {
-      ...options,
+      ...requestOptions,
       headers: {
-        Accept: "application/json",
-        ...options.headers
-      }
+        Accept: 'application/json',
+        ...requestOptions.headers,
+      },
     });
     const clonedResponse = response.clone();
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get('content-type');
     let data;
     let text;
     let blob;
     text = await clonedResponse.text();
     try {
-      data = contentType?.includes("application/json") ? JSON.parse(text) : {};
+      data = contentType?.includes('application/json') ? JSON.parse(text) : {};
     } catch (e) {
       data = {};
     }
@@ -116,13 +224,15 @@ var fetchAPI = async (url, options = {}) => {
       statusText: response.statusText,
       data,
       text,
-      blob
+      blob,
     };
     if (!response.ok) {
       throw new ApiError(
         response.status,
         response.statusText,
-        typeof data === "object" && data && "message" in data ? String(data.message) : `Request failed with status ${response.status}`,
+        typeof data === 'object' && data && 'message' in data
+          ? String(data.message)
+          : `Request failed with status ${response.status}`,
         response,
         data
       );
@@ -130,314 +240,486 @@ var fetchAPI = async (url, options = {}) => {
     return fetchResponse;
   } catch (error) {
     if (error instanceof ApiError) {
-      console.warn("throw ERROR");
+      console.warn('throw ERROR');
       console.log(error);
       return error;
     }
-    console.log("ICI");
-    const errorResponse = new Response(null, { status: 0, statusText: "Network Error" });
+    const errorResponse = new Response(null, { status: 0, statusText: 'Network Error' });
     return new ApiError(
       0,
-      "Network Error",
-      error instanceof Error ? error.message : "Unknown error occurred",
+      'Network Error',
+      error instanceof Error ? error.message : 'Unknown error occurred',
       errorResponse,
-      { message: "Network Error" }
+      { message: 'Network Error' }
     );
   }
+};
+var fetchGET = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: 'GET' });
+};
+var fetchPOST = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: 'POST',
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPUT = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: 'PUT',
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchPATCH = async (url, body, options = {}) => {
+  const requestOptions = {
+    ...options,
+    method: 'PATCH',
+  };
+  if (body !== void 0) {
+    requestOptions.body = body;
+  }
+  return fetchAPI(url, requestOptions);
+};
+var fetchDELETE = async (url, options = {}) => {
+  return fetchAPI(url, { ...options, method: 'DELETE' });
 };
 
 // public/ts/utils/form.ts
 var _FormManager = class _FormManager {
-  constructor({ form, initialData }) {
-    __publicField(this, "form");
-    __publicField(this, "initialData");
+  /**
+   * Creates a new FormManager instance
+   * @param config - Configuration object containing form and optional initial data
+   */
+  constructor({ form, initialData = {} }) {
+    // Core properties
+    __publicField(this, 'form');
+    __publicField(this, 'initialData');
     this.form = form;
     this.initialData = initialData;
-    this.init();
+    this.initialize();
   }
   /**
-   * Get all form fields
-   * @returns NodeListOf<Element> List of form fields
+   * Initializes the form with initial data if provided
+   */
+  initialize() {
+    if (Object.keys(this.initialData).length > 0) {
+      this.fillData(this.initialData);
+    }
+  }
+  /**
+   * Gets all form fields using the standard selector
    */
   getFormFields() {
     return this.form.querySelectorAll(_FormManager.FORM_FIELD_SELECTOR);
   }
   /**
-   * Reset validation state of a field
-   * @param field The form field element
+   * Finds the appropriate container for a form field
+   */
+  getFieldContainer(field) {
+    const fieldset = field.closest('fieldset');
+    const div = field.closest('div');
+    return fieldset || div;
+  }
+  /**
+   * Resets validation state of a specific field
+   * @param field - The form field element to reset
    */
   resetFieldState(field) {
-    const container = field.closest("fieldset") || field.closest("div");
-    const feedback = container.querySelector(".invalid-feedback, .valid-feedback");
-    field.classList.remove("is-valid", "is-invalid");
+    const container = this.getFieldContainer(field);
+    const feedback = container?.querySelector(_FormManager.FEEDBACK_CLASSES);
+    field.classList.remove(_FormManager.VALIDATION_CLASSES.VALID, _FormManager.VALIDATION_CLASSES.INVALID);
     feedback?.remove();
   }
   /**
-   * Extract value from an input field based on its type
-   * @param field Input field element
-   * @param data Current form data object
+   * Checks if a field name already exists in the data object
    */
-  handleInputField(field, data) {
-    const { type, name, value } = field;
-    if (data.hasOwnProperty(name)) return;
-    if (type === "checkbox" || type === "radio") {
-      const choices = this.form.querySelectorAll(`input[name="${name}"]:checked`);
-      if (Array.from(choices).length > 1) {
-        data[name] = Array.from(choices).map((el) => el.value);
-      } else {
-        data[name] = choices[0]?.value ?? null;
-      }
-    } else if (["text", "number", "date", "datetime", "password", "hidden"].includes(type)) {
-      data[name] = value === "" ? null : value;
+  isFieldProcessed(fieldName, data) {
+    return Object.prototype.hasOwnProperty.call(data, fieldName);
+  }
+  /**
+   * Processes checkbox and radio input fields
+   */
+  processChoiceInputs(field, data) {
+    const { name } = field;
+    const checkedInputs = this.form.querySelectorAll(`input[name="${name}"]:checked`);
+    const checkedValues = Array.from(checkedInputs).map((input) => input.value);
+    if (checkedValues.length > 1) {
+      data[name] = checkedValues;
+    } else {
+      data[name] = checkedValues[0] || null;
     }
   }
   /**
-   * Extract value from a select field
-   * @param field Select field element
-   * @param data Current form data object
+   * Processes standard input fields (text, number, date, etc.)
+   */
+  processStandardInputs(field, data) {
+    const { name, value, type } = field;
+    const supportedTypes = [
+      _FormManager.INPUT_TYPES.TEXT,
+      _FormManager.INPUT_TYPES.NUMBER,
+      _FormManager.INPUT_TYPES.DATE,
+      _FormManager.INPUT_TYPES.DATETIME,
+      _FormManager.INPUT_TYPES.PASSWORD,
+      _FormManager.INPUT_TYPES.HIDDEN,
+      _FormManager.INPUT_TYPES.EMAIL,
+      _FormManager.INPUT_TYPES.URL,
+      _FormManager.INPUT_TYPES.TEL,
+    ];
+    if (supportedTypes.includes(type)) {
+      data[name] = value.trim() === '' ? null : value;
+    }
+  }
+  /**
+   * Extracts value from an input field based on its type
+   */
+  handleInputField(field, data) {
+    const { type, name } = field;
+    if (this.isFieldProcessed(name, data)) return;
+    if (type === _FormManager.INPUT_TYPES.CHECKBOX || type === _FormManager.INPUT_TYPES.RADIO) {
+      this.processChoiceInputs(field, data);
+    } else {
+      this.processStandardInputs(field, data);
+    }
+  }
+  /**
+   * Extracts value from a select field
    */
   handleSelectField(field, data) {
     const { name } = field;
-    const selectedOptions = Array.from(field.options).filter((opt) => opt.selected);
+    const selectedOptions = Array.from(field.options).filter((option) => option.selected);
     if (selectedOptions.length > 1) {
-      data[name] = selectedOptions.map((opt) => opt.value);
+      data[name] = selectedOptions.map((option) => option.value);
     } else {
       data[name] = field.value || null;
     }
   }
   /**
-   * Get all form data
-   * @returns FormDataType Object containing all form field values
+   * Extracts value from a textarea field
+   */
+  handleTextareaField(field, data) {
+    const { name, value } = field;
+    data[name] = value.trim() === '' ? null : value;
+  }
+  /**
+   * Extracts all form data into a structured object
    */
   getData() {
     const data = {};
     const fields = this.getFormFields();
     for (const field of fields) {
       const { tagName } = field;
-      switch (tagName) {
-        case "INPUT":
+      switch (tagName.toUpperCase()) {
+        case 'INPUT':
           this.handleInputField(field, data);
           break;
-        case "SELECT":
+        case 'SELECT':
           this.handleSelectField(field, data);
           break;
-        case "TEXTAREA":
-          const { name, value } = field;
-          data[name] = value;
+        case 'TEXTAREA':
+          this.handleTextareaField(field, data);
           break;
       }
     }
     return data;
   }
   /**
-   * Set value for an input field based on its type
-   * @param field Input field element
-   * @param value Value to set
+   * Sets value for checkbox and radio inputs
+   */
+  setChoiceInputValue(field, value) {
+    if (Array.isArray(value)) {
+      field.checked = value.includes(field.value);
+    } else {
+      field.checked = value === true || field.value === String(value);
+    }
+  }
+  /**
+   * Sets value for standard input fields
+   */
+  setStandardInputValue(field, value) {
+    field.value = String(value || '');
+  }
+  /**
+   * Sets value for an input field based on its type
    */
   fillInputField(field, value) {
     const { type } = field;
-    if (type === "checkbox" || type === "radio") {
-      if (Array.isArray(value)) {
-        field.checked = value.includes(field.value);
-      } else {
-        field.checked = value === true || field.value === value;
-      }
-    } else if (["text", "number", "date", "datetime", "password", "hidden"].includes(type)) {
-      field.value = value ?? "";
+    if (type === _FormManager.INPUT_TYPES.CHECKBOX || type === _FormManager.INPUT_TYPES.RADIO) {
+      this.setChoiceInputValue(field, value);
+    } else {
+      this.setStandardInputValue(field, value);
     }
   }
   /**
-   * Set value for a select field
-   * @param field Select field element
-   * @param value Value to set
+   * Sets value for a select field (single or multiple selection)
    */
   fillSelectField(field, value) {
+    Array.from(field.options).forEach((option) => {
+      option.selected = false;
+    });
     if (Array.isArray(value)) {
-      Array.from(field.options).forEach((opt) => {
-        opt.selected = value.includes(opt.value);
+      Array.from(field.options).forEach((option) => {
+        option.selected = value.includes(option.value);
       });
-    } else if (value !== null && value !== "") {
-      const option = Array.from(field.options).find((opt) => opt.value === value);
-      if (option) option.selected = true;
+    } else if (value !== null && value !== void 0 && value !== '') {
+      const targetOption = Array.from(field.options).find((option) => option.value === String(value));
+      if (targetOption) {
+        targetOption.selected = true;
+      }
     }
   }
   /**
-   * Fill form with data
-   * @param data Data to fill the form with
+   * Populates form fields with provided data
    */
   fillData(data) {
     const fields = this.getFormFields();
     for (const field of fields) {
-      const { tagName, name } = field;
-      if (!data.hasOwnProperty(name)) continue;
-      const value = data[name];
+      const { tagName } = field;
+      const fieldName = field.name;
+      if (!Object.prototype.hasOwnProperty.call(data, fieldName)) continue;
+      const value = data[fieldName];
       this.resetFieldState(field);
-      switch (tagName) {
-        case "INPUT":
+      switch (tagName.toUpperCase()) {
+        case 'INPUT':
           this.fillInputField(field, value);
           break;
-        case "SELECT":
+        case 'SELECT':
           this.fillSelectField(field, value);
           break;
-        case "TEXTAREA":
-          field.value = value ?? "";
+        case 'TEXTAREA':
+          field.value = String(value || '');
           break;
       }
     }
   }
   /**
-   * Display error message for a specific field
-   * @param field The form field element
-   * @param container The container element of the field
-   * @param error The existing error element if any
-   * @param errorMessage The error message to display
-   * @param isValid Whether the field is valid
+   * Escapes HTML content to prevent XSS attacks
    */
-  displayFieldError(field, container, error, errorMessage, isValid) {
-    const isCheckboxOrRadio = field.tagName === "INPUT" && ["checkbox", "radio"].includes(field.type);
-    if (!isValid) {
-      if (isCheckboxOrRadio) {
-        const choices = this.form.querySelectorAll(
-          `input[name="${field.name}"]`
-        );
-        choices.forEach((el) => {
-          el.classList.add("is-invalid");
-        });
-      } else {
-        field.classList.add("is-invalid");
-      }
-      if (error === null && errorMessage) {
-        const errorElement = document.createElement("small");
-        errorElement.innerHTML = errorMessage;
-        errorElement.classList.add("invalid-feedback");
-        container.insertAdjacentElement("beforeend", errorElement);
-      }
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  /**
+   * Creates and inserts an error message element
+   */
+  createErrorElement(container, errorMessage) {
+    const errorElement = document.createElement('small');
+    errorElement.innerHTML = this.escapeHtml(errorMessage);
+    errorElement.className = 'invalid-feedback';
+    container.appendChild(errorElement);
+  }
+  /**
+   * Applies validation styles for checkbox and radio groups
+   */
+  applyChoiceFieldValidation(field, isValid) {
+    const fieldName = field.name;
+    const relatedFields = this.form.querySelectorAll(`input[name="${fieldName}"]`);
+    relatedFields.forEach((relatedField) => {
+      relatedField.classList.toggle(_FormManager.VALIDATION_CLASSES.INVALID, !isValid);
+      relatedField.classList.toggle(_FormManager.VALIDATION_CLASSES.VALID, isValid);
+    });
+  }
+  /**
+   * Applies validation styles for standard fields
+   */
+  applyStandardFieldValidation(field, isValid) {
+    field.classList.toggle(_FormManager.VALIDATION_CLASSES.INVALID, !isValid);
+    field.classList.toggle(_FormManager.VALIDATION_CLASSES.VALID, isValid);
+  }
+  /**
+   * Displays or removes error message for a specific field
+   */
+  displayFieldError(field, container, existingError, errorMessage, isValid) {
+    const isChoiceField = field.tagName === 'INPUT' && ['checkbox', 'radio'].includes(field.type);
+    if (isChoiceField) {
+      this.applyChoiceFieldValidation(field, isValid);
     } else {
-      field.classList.remove("is-invalid");
-      field.classList.add("is-valid");
-      error?.remove();
+      this.applyStandardFieldValidation(field, isValid);
+    }
+    if (!isValid && errorMessage && !existingError) {
+      this.createErrorElement(container, errorMessage);
+    } else if (isValid && existingError) {
+      existingError.remove();
     }
   }
   /**
-   * Handle form validation violations
-   * @param violations Object containing field names and their error messages
+   * Handles form validation violations and displays appropriate feedback
    */
   handleViolations(violations) {
     const fields = this.form.querySelectorAll(_FormManager.FORM_FIELD_SELECTOR);
     for (const field of fields) {
-      const { name } = field;
-      const container = field.closest("fieldset") || field.closest("div");
-      const error = container.querySelector(".invalid-feedback");
-      const hasViolation = violations.hasOwnProperty(name);
-      const errorMessage = hasViolation ? violations[name] : null;
-      this.displayFieldError(field, container, error, errorMessage, !hasViolation);
+      const fieldName = field.name;
+      const container = this.getFieldContainer(field);
+      const existingError = container?.querySelector('.invalid-feedback');
+      const hasViolation = Object.prototype.hasOwnProperty.call(violations, fieldName);
+      const errorMessage = hasViolation ? String(violations[fieldName]) : null;
+      if (container) {
+        this.displayFieldError(field, container, existingError, errorMessage, !hasViolation);
+      }
     }
   }
+  /**
+   * Resets validation state of all form fields
+   */
   resetFormFieldsState() {
     const fields = this.getFormFields();
-    return fields.forEach((f) => this.resetFieldState(f));
+    fields.forEach((field) => this.resetFieldState(field));
   }
   /**
-   * Reset form to its initial state
+   * Resets input field to its default state
+   */
+  resetInputField(field) {
+    const { type } = field;
+    if (type === _FormManager.INPUT_TYPES.CHECKBOX || type === _FormManager.INPUT_TYPES.RADIO) {
+      field.checked = false;
+    } else {
+      field.value = '';
+    }
+  }
+  /**
+   * Resets select field to its default state
+   */
+  resetSelectField(field) {
+    Array.from(field.options).forEach((option) => {
+      option.selected = false;
+    });
+  }
+  /**
+   * Resets textarea field to its default state
+   */
+  resetTextareaField(field) {
+    field.value = '';
+  }
+  /**
+   * Resets form to its initial state
    */
   reset() {
     const fields = this.getFormFields();
     fields.forEach((field) => {
       const { tagName } = field;
-      switch (tagName) {
-        case "INPUT":
-          const input = field;
-          if (input.type === "checkbox" || input.type === "radio") {
-            input.checked = false;
-          } else {
-            input.value = "";
-          }
+      switch (tagName.toUpperCase()) {
+        case 'INPUT':
+          this.resetInputField(field);
           break;
-        case "SELECT":
-          Array.from(field.options).forEach((opt) => opt.selected = false);
+        case 'SELECT':
+          this.resetSelectField(field);
           break;
-        case "TEXTAREA":
-          field.value = "";
+        case 'TEXTAREA':
+          this.resetTextareaField(field);
           break;
       }
     });
+    this.resetFormFieldsState();
   }
-  init() {
-    if (this.initialData) {
-      this.fillData(this.initialData);
-    }
+  /**
+   * Gets the current initial data
+   */
+  getInitialData() {
+    return { ...this.initialData };
+  }
+  /**
+   * Gets the form element
+   */
+  getForm() {
+    return this.form;
   }
 };
-__publicField(_FormManager, "FORM_FIELD_SELECTOR", "input, select, textarea");
-var FormManager = _FormManager;
-var example = `
-// Initialize form manager
-const initialData: FormDataType = {
-    transport: ['Train', 'Bus'],
-    isActive: false,
-    exampleSelect: '4',
-    password: 'testPassword',
-    dueDate: '2002-01-12',
-    message: 'Example message'
-};
-
-const violations = {
-    transport: 'This field is required',
-    isActive: 'This field is required',
-    message: 'This field is required',
-    dueDate: 'This field is required'
-};
-
-const formManager = new FormManager({ 
-    form: document.getElementById('formManagerId') as HTMLFormElement, 
-    initialData 
+// Constants for field selection and validation
+__publicField(_FormManager, 'FORM_FIELD_SELECTOR', 'input, select, textarea');
+__publicField(_FormManager, 'FEEDBACK_CLASSES', '.invalid-feedback, .valid-feedback');
+__publicField(_FormManager, 'VALIDATION_CLASSES', {
+  VALID: 'is-valid',
+  INVALID: 'is-invalid',
 });
-
-// Handle form violations
-formManager.handleViolations(violations);
-
-// Reset form when needed
-formManager.reset();
-`;
+__publicField(_FormManager, 'INPUT_TYPES', {
+  CHECKBOX: 'checkbox',
+  RADIO: 'radio',
+  TEXT: 'text',
+  NUMBER: 'number',
+  DATE: 'date',
+  DATETIME: 'datetime',
+  PASSWORD: 'password',
+  HIDDEN: 'hidden',
+  EMAIL: 'email',
+  URL: 'url',
+  TEL: 'tel',
+});
+var FormManager = _FormManager;
 
 // public/ts/admin/user.ts
 var editForm = new FormManager({
-  form: document.getElementById("editUserInfosForm")
+  form: document.getElementById('editUserInfosForm'),
 });
 var handleEditFormSubmit = async (e) => {
   e.preventDefault();
   const data = editForm.getData();
-  const actionUrl = editForm.form.getAttribute("action");
+  const actionUrl = editForm.getForm().getAttribute('action');
   try {
-    const response = await fetchAPI(actionUrl, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    const response = await fetchPOST(actionUrl, data);
     if (response.ok) {
       const responseData = response.data;
-      if (data?.message) {
-        new Alert(responseData.message, "success", {
-          containerId: "editUserInfosAlert",
+      if (responseData?.message) {
+        new Alert(responseData.message, 'success', {
+          containerId: 'editUserInfosForm',
           duration: 5e3,
-          dismissible: true
+          dismissible: true,
         });
       }
     } else {
       if (response.status === 400) {
         const responseData = response.data;
         if (responseData.violations) {
-          responseData.violations.message ? (new Alert(responseData.violations.message, "danger", {
-            containerId: "editUserInfosAlert",
-            dismissible: true
-          }), delete responseData.violations.message) : editForm.handleViolations(responseData.violations);
+          responseData.violations.message
+            ? (new Alert(responseData.violations.message, 'danger', {
+                containerId: 'editUserInfosForm',
+                dismissible: true,
+              }),
+              delete responseData.violations.message)
+            : editForm.handleViolations(responseData.violations);
         }
       }
     }
   } catch (error) {
-    console.error("Failed to create user : ", error);
+    console.error('Failed to create user : ', error);
   }
 };
-editForm.form.addEventListener("submit", (e) => handleEditFormSubmit(e));
+var handleChangeRole = async (e) => {
+  e.preventDefault();
+  const target = e.target;
+  const url = target.getAttribute('data-href');
+  const q = target.getAttribute('data-action');
+  const role = target.value;
+  const data = { role, q };
+  try {
+    const response = await fetchPOST(url, data);
+    if (response.ok) {
+      new Alert('Le r\xF4le a \xE9t\xE9 modifi\xE9 avec succ\xE8s \u{1F680}', 'success', {
+        containerId: 'editUserInfosAlert',
+        duration: 5e3,
+        dismissible: true,
+      });
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }, 5e3);
+    } else {
+      console.error('Erreur lors de la modification du r\xF4le.');
+      new Alert('Erreur lors de la modification du r\xF4le.', 'danger', {
+        containerId: 'user-permission-tab',
+        dismissible: true,
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la modification du r\xF4le : ', error);
+  }
+};
+editForm.getForm().addEventListener('submit', (e) => handleEditFormSubmit(e));

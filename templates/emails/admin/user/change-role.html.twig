@@ -1,0 +1,52 @@
+{% extends "emails/base.html.twig" %}
+
+{% block content %}
+  {# Titre de bienvenue avec emoji #}
+  {% include "emails/components/heading.html.twig" with {
+    'text': user.name ?? user.username,
+    'emoji': '👋',
+    'center': true
+  } %}
+
+  {# Titre principal #}
+  {% include "emails/components/heading.html.twig" with {
+    'text': 'Modification de votre rôle',
+    'emoji': '🔄',
+    'center': true
+  } %}
+
+  {# Message d'explication #}
+  {% include "emails/components/paragraph.html.twig" with {
+    'content': 'Nous vous informons que votre rôle sur notre plateforme a été modifié. Voici les détails de votre nouveau statut :',
+    'center': true
+  } %}
+
+  {# Informations utilisateur #}
+  {% include "emails/components/user-info.html.twig" with {
+    'title': 'Informations de votre compte :',
+    'info_items': [
+      {'label': 'Nom d\'utilisateur', 'value': user.username},
+      {'label': 'Email', 'value': user.email},
+      {'label': 'Nouveau rôle', 'value': user.roles}
+    ]
+  } %}
+
+  {# Message informatif #}
+  {% include "emails/components/paragraph.html.twig" with {
+    'content': '<p style="margin-bottom: 0;">Cette modification prend effet immédiatement.</p><p style="margin-bottom: 0;">Vous pouvez désormais accéder aux nouvelles fonctionnalités correspondant à votre rôle.</p>',
+    'center': true
+  } %}
+
+  {# Bouton d'accès à l'application #}
+  {% include "emails/components/button.html.twig" with {
+    'url': app_link,
+    'text': 'Accéder à l\'application',
+    'color': '#4b38b3'
+  } %}
+
+  {# Lien de fallback #}
+  {% include "emails/components/link-fallback.html.twig" with {
+    'url': app_link,
+    'message': 'Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :'
+  } %}
+{% endblock %}

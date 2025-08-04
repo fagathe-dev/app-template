@@ -1,0 +1,19 @@
+{#
+  Composant de titre pour les emails
+  
+  Paramètres:
+  - text: Le texte du titre (requis)
+  - level: Le niveau du titre (h1, h2, h3, h4, h5, h6) - défaut: h4
+  - emoji: Emoji optionnel à afficher avant le texte
+  - center: Boolean pour centrer le texte - défaut: true
+#}
+{% set level = level|default('h4') %}
+{% set center = center|default(true) %}
+
+<tr style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+  <td class="content-block" style="font-family: 'Roboto', sans-serif; box-sizing: border-box; font-size: 24px; vertical-align: top; margin: 0; padding: 0 0 10px;{% if center %} text-align: center;{% endif %}" valign="top">
+    <{{ level }} style="font-family: 'Roboto', sans-serif; font-weight: 500;">
+      {% if emoji is defined %}{{ emoji }} {% endif %}{{ text }}
+    </{{ level }}>
+  </td>
+</tr>

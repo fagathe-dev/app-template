@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Only run for interactive commits (when commit message is empty or from template)
 if [ "$2" = "" ] || [ "$2" = "template" ]; then
   # Use Node.js script to generate commit message suggestion

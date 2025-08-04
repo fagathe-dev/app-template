@@ -13,7 +13,6 @@ use Fagathe\Libs\Helpers\Request\ResponseTrait;
 use Fagathe\Libs\Helpers\Token\Token;
 use Fagathe\Libs\Logger\Logger;
 use Fagathe\Libs\Logger\LoggerLevelEnum;
-use Fagathe\Libs\Utils\Mailer\Email;
 use Fagathe\Libs\Utils\Mailer\MailerService;
 use Fagathe\Libs\Utils\UserRequestEnum;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -130,44 +129,50 @@ final class AuthService
      */
     private function sendVerificationEmail(User $user): void
     {
-        $request = new UserRequest;
-        $request->setCreatedAt($this->now())
-            ->setType(UserRequestEnum::ACCOUNT_ACTIVATION_REQUEST->value)
-            ->setIsOpen(true)
-            ->setExpiredAt($this->now()->modify('+7 day'))
-            ->setToken(Token::generate(50, unique: true))
-        ;
+        try {
+            $request = new UserRequest();
+            $request->setCreatedAt($this->now())
+                ->setType(UserRequestEnum::ACCOUNT_ACTIVATION_REQUEST->value)
+                ->setIsOpen(true)
+                ->setExpiredAt($this->now()->modify('+7 day'))
+                ->setToken(Token::generate(50, unique: true));
 
-        $user->addRequest($request);
+            $user->addRequest($request);
+            $this->userService->save($user);
 
-        $this->userService->save($user);
-        $userName = ($user->getFirstname() . ' ' . $user->getLastname()) === '' ? ($user->getFirstname() . ' ' . $user->getLastname()) : $user->getUsername();
+            $userName = trim($user->getFirstname() . ' ' . $user->getLastname()) ?: $user->getUsername();
 
-        // Optionally, you can send a confirmation email here
-        $email = new Email(
-            name: 'AUTH_VERIFY_ACCOUNT',
-            action: 'Vérification de compte',
-            template: 'auth/verify-account',
-            context: [
-                'user' => [
-                    'name' => $userName,
-                    'email' => $user->getEmail(),
-                    'username' => $user->getUsername(),
-                ],
-                'activation_link' => $this->urlGenerator->generate(
-                    'auth_registration_verify',
-                    ['token' => $request->getToken()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ]
-        );
+            $this->mailer->sendEmail(
+                recepient: [$userName => $user->getEmail()],
+                subject: 'Vérification de votre compte',
+                template: 'auth/verify-account',
+                context: [
+                    'user' => [
+                        'name' => $userName,
+                        'email' => $user->getEmail(),
+                        'username' => $user->getUsername(),
+                    ],
+                    'activation_link' => $this->urlGenerator->generate(
+                        'auth_registration_verify',
+                        ['token' => $request->getToken()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                ]
+            );
 
-        $this->mailer->sendEmail(
-            recepient: [$userName => $user->getEmail()],
-            subject: 'Vérification de votre compte',
-            template: $email->getTemplate(),
-            context: $email->getContext()
-        );
+            $this->generateLog(
+                content: ['message' => 'Verification email sent', 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Info
+            );
+        } catch (\Exception $e) {
+            $this->generateLog(
+                content: ['exception' => $e->getMessage(), 'user' => $user->getUserIdentifier()],
+                context: ['action' => __METHOD__],
+                level: LoggerLevelEnum::Error
+            );
+            throw $e;
+        }
     }
 
 
