@@ -37,7 +37,8 @@ final class UserEmailService
     {
         try {
             $userName = trim($user->getFirstname() . ' ' . $user->getLastname()) ?: $user->getUsername();
-
+            
+            // Send email to the user
             $this->mailer->sendEmail(
                 recepient: [$userName => $user->getEmail()],
                 subject: 'Modification de votre rôle',

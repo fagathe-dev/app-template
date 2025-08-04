@@ -21,6 +21,7 @@ final class MailerService
 
     private const LOG_FILE = 'mailer/mailer';
     private const DEFAULT_EMAIL_TEMPLATES_DIR = 'emails/';
+    private const TEMPLATE_SUFFIX = '.html.twig';
 
     use RequestTrait;
 
@@ -109,21 +110,21 @@ final class MailerService
     }
 
     /**
-     * Normalizes the template path by removing common prefixes and suffixes.
+     * Normalizes the template path by ensuring proper prefixes and suffixes are present.
      *
      * @param string $template
      * @return string
      */
     private function normalizeTemplate(string $template): string
     {
-        // Remove the default email templates directory prefix if present
-        if (str_starts_with($template, static::DEFAULT_EMAIL_TEMPLATES_DIR)) {
-            $template = substr($template, strlen(static::DEFAULT_EMAIL_TEMPLATES_DIR));
+        // Add the default email templates directory prefix if not present
+        if (!str_starts_with($template, static::DEFAULT_EMAIL_TEMPLATES_DIR)) {
+            $template = static::DEFAULT_EMAIL_TEMPLATES_DIR . $template;
         }
 
-        // Remove the .html.twig suffix if present
-        if (str_ends_with($template, '.html.twig')) {
-            $template = substr($template, 0, -10); // Remove '.html.twig' (10 characters)
+        // Add the .html.twig suffix if not present
+        if (!str_ends_with($template, static::TEMPLATE_SUFFIX)) {
+            $template = $template . static::TEMPLATE_SUFFIX;
         }
 
         return $template;

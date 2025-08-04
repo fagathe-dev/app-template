@@ -433,7 +433,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'edit_action', methods: ['PUT'])]
+    #[Route('/{id}/edit', name: 'edit_post', methods: ['PUT'])]
     #[IsGranted('admin.user.edit')]
     public function putAction(User $user, Request $request): Response
     {

@@ -44,7 +44,7 @@
 <div id="editUserInfosModal" data-backdrop="static" class="modal fade" tabindex="-1" aria-labelledby="editUserInfosModalLabel" aria-hidden="true" style="display: none;">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <form action="{{ url('admin_user_edit_action', {id: user.id, a: 'update-user-infos'}) }}" method="post" id="editUserInfosForm">
+      <form action="{{ url('admin_user_edit_post', {id: user.id }) }}" method="post" id="editUserInfosForm">
         <div class="modal-header">
           <h5 class="modal-title" id="editUserInfosModalLabel">Modifier les informations utilisateur</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
@@ -55,7 +55,7 @@
             <label for="firstname">Prénom</label>
             <input type="text" class="form-control" id="firstname" name="firstname" value="{{ user.firstname }}" >
           </div>
-
+          <input type="hidden" name="q" value="update-user-infos">
           <div class="form-group">
             <label for="lastname">Nom de famille</label>
             <input type="text" class="form-control" id="lastname" name="lastname" value="{{ user.lastname }}" >

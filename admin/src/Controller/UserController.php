@@ -53,7 +53,7 @@ final class UserController extends AbstractController
         return $this->render('@admin/user/edit.html.twig', $this->userService->edit($user));
     }
 
-    #[Route('/{id}/edit', name: 'edit_action', methods: ['PUT'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}/edit', name: 'edit_post', methods: ['POST'], requirements: ['id' => '\d+'])]
     #[IsGranted('admin.user.edit')]
     public function putAction(User $user, Request $request): Response
     {
@@ -66,7 +66,7 @@ final class UserController extends AbstractController
         );
     }
 
-    #[Route('/{id}/edit', name: 'edit_action', methods: ['PATCH'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}/edit', name: 'edit_patch', methods: ['PATCH'], requirements: ['id' => '\d+'])]
     #[IsGranted('admin.user.edit')]
     public function patchAction(User $user, Request $request): Response
     {
